@@ -68,7 +68,7 @@ Final-ERP/
     ```bash
     cd frontend
     ```
-2.  Install dependencies:
+2.  (Optional) Install dependencies (node_modules is already included):
     ```bash
     npm install
     ```
