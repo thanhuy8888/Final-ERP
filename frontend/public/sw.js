@@ -1,4 +1,4 @@
-const CACHE_NAME = 'canifa-erp-v1';
+const CACHE_NAME = 'canifa-erp-v2';
 const STATIC_CACHE = 'canifa-static-v1';
 const API_CACHE = 'canifa-api-v1';
 
@@ -60,7 +60,12 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(() => {
                     // Fallback to cached API response
-                    return caches.match(request);
+                    return caches.match(request).then(response => {
+                        return response || new Response(JSON.stringify({ error: 'Network error (offline)' }), {
+                            status: 503,
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                    });
                 })
         );
         return;

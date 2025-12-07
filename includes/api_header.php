@@ -3,8 +3,13 @@
  * API Header with CORS, Rate Limiting, and Security
  */
 
-// CORS - Allow requests from React dev server
-header('Access-Control-Allow-Origin: http://localhost:5173');
+// CORS - Allow requests from React dev server (dynamic port support)
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (preg_match('/^http:\/\/localhost:\d+$/', $origin)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header('Access-Control-Allow-Origin: http://localhost:5173');
+}
 header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
