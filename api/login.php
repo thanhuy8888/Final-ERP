@@ -2,18 +2,19 @@
 require_once '../includes/api_header.php';
 require_once '../includes/db.php';
 
-
 // Get JSON input
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!$data) {
-    // Fallback to POST if form-data is used
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 } else {
     $username = $data['username'] ?? '';
     $password = $data['password'] ?? '';
 }
+
+// Input validation
+$username = InputValidator::sanitizeString($username);
 
 if (empty($username) || empty($password)) {
     http_response_code(400);

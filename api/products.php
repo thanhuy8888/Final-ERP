@@ -18,6 +18,38 @@ require_once '../includes/db.php';
 require_once '../includes/file_cache.php';
 
 try {
+    // Single product fetch by ID (for ProductDetail page)
+    if (isset($_GET['id'])) {
+        $productId = intval($_GET['id']);
+        $cacheKey = 'product_' . $productId;
+        
+        $cachedResult = $cache->get($cacheKey);
+        if ($cachedResult !== null) {
+            header('X-Cache: HIT');
+            echo json_encode($cachedResult);
+            exit;
+        }
+        
+        header('X-Cache: MISS');
+        $stmt = $pdo->prepare("
+            SELECT p.*, c.name as category_name 
+            FROM products p 
+            LEFT JOIN categories c ON p.category_id = c.id 
+            WHERE p.id = ? AND p.is_active = 1
+        ");
+        $stmt->execute([$productId]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($product) {
+            $cache->set($cacheKey, $product, 300);
+            echo json_encode($product);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Product not found']);
+        }
+        exit;
+    }
+    
     // Generate cache key from all query params
     $cacheKey = 'products_' . md5(json_encode($_GET));
     

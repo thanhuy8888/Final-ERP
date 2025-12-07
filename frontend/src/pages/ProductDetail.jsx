@@ -40,11 +40,12 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
         try {
             const [productRes, variantsRes] = await Promise.all([
-                api.get('/products.php'),
+                api.get(`/products.php?id=${id}`),
                 api.get(`/variants.php?product_id=${id}`)
             ]);
 
-            const found = productRes.data.find(p => p.id == id);
+            // API now returns single product directly when id is provided
+            const found = productRes.data.error ? null : productRes.data;
             setProduct(found);
             setVariants(variantsRes.data || []);
 
