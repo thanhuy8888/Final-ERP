@@ -47,7 +47,8 @@ const ProductDetail = () => {
             // API now returns single product directly when id is provided
             const found = productRes.data.error ? null : productRes.data;
             setProduct(found);
-            setVariants(variantsRes.data || []);
+            // Ensure data is array to prevent map crash
+            setVariants(Array.isArray(variantsRes.data) ? variantsRes.data : []);
 
             // Auto-select first available size/color
             if (variantsRes.data?.length > 0) {

@@ -1,23 +1,22 @@
 -- =====================================================
--- CANIFA Fashion System - Database Creation Script
+-- CANIFA Fashion System - Consolidated Database Script
 -- =====================================================
 
--- Drop existing database if exists (use with caution in production)
-DROP DATABASE IF EXISTS canifa_fashion_db;
-CREATE DATABASE canifa_fashion_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE canifa_fashion_db;
+DROP DATABASE IF EXISTS final_erp;
+CREATE DATABASE final_erp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE final_erp;
 
 -- =====================================================
--- 1. USER Table
+-- 1. USERS Table
 -- =====================================================
-CREATE TABLE USER (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
     phone VARCHAR(20),
-    role ENUM('Admin', 'Sales') NOT NULL DEFAULT 'Sales',
+    role ENUM('admin', 'customer', 'sale') NOT NULL DEFAULT 'customer',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -26,26 +25,31 @@ CREATE TABLE USER (
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 2. CUSTOMER Table
+-- 2. CUSTOMERS Table
 -- =====================================================
-CREATE TABLE CUSTOMER (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    phone_number VARCHAR(20) NOT NULL UNIQUE,
+CREATE TABLE customers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    phone VARCHAR(20) NOT NULL UNIQUE,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100),
+    address TEXT,
+    city VARCHAR(50),
     membership_tier ENUM('Silver', 'Gold', 'Diamond') NOT NULL DEFAULT 'Silver',
     total_points INT NOT NULL DEFAULT 0,
-    registered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT NULL COMMENT 'Sale user who created this customer',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_phone (phone_number),
-    INDEX idx_membership (membership_tier),
-    CONSTRAINT chk_total_points CHECK (total_points >= 0)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_phone (phone),
+    INDEX idx_membership (membership_tier)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 3. STORE Table
+-- 3. STORES Table
 -- =====================================================
-CREATE TABLE STORE (
+CREATE TABLE stores (
     store_id INT AUTO_INCREMENT PRIMARY KEY,
     store_code VARCHAR(20) NOT NULL UNIQUE,
     store_name VARCHAR(100) NOT NULL,
@@ -55,141 +59,138 @@ CREATE TABLE STORE (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_store_code (store_code),
-    INDEX idx_city (city),
+    INDEX idx_city (city)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- 4. CATEGORIES Table
+-- =====================================================
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- 5. PRODUCTS Table
+-- =====================================================
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(50) UNIQUE,
+    barcode VARCHAR(50) UNIQUE,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    category_id INT,
+    image VARCHAR(255),
+    material VARCHAR(100),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    INDEX idx_sku (sku),
+    INDEX idx_barcode (barcode),
     INDEX idx_is_active (is_active)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 4. PRODUCT Table
+-- 6. PRODUCT_VARIANTS Table
 -- =====================================================
-CREATE TABLE PRODUCT (
-    product_id INT AUTO_INCREMENT PRIMARY KEY,
-    sku VARCHAR(50) NOT NULL UNIQUE,
-    barcode VARCHAR(50) NOT NULL UNIQUE,
-    product_name VARCHAR(200) NOT NULL,
-    description TEXT,
-    material VARCHAR(100),
-    category ENUM('Men', 'Women', 'Kids') NOT NULL,
-    base_price DECIMAL(10, 2) NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_sku (sku),
-    INDEX idx_barcode (barcode),
-    INDEX idx_category (category),
-    INDEX idx_is_active (is_active),
-    CONSTRAINT chk_base_price CHECK (base_price >= 0)
-) ENGINE=InnoDB;
-
--- =====================================================
--- 5. PRODUCT_VARIANT Table
--- =====================================================
-CREATE TABLE PRODUCT_VARIANT (
+CREATE TABLE product_variants (
     variant_id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
-    size VARCHAR(10) NOT NULL COMMENT 'S, M, L, XL, XXL',
+    size VARCHAR(10) NOT NULL,
     color VARCHAR(50) NOT NULL,
-    variant_sku VARCHAR(50) NOT NULL UNIQUE,
+    color_code VARCHAR(7),
+    variant_sku VARCHAR(50) UNIQUE,
+    quantity INT NOT NULL DEFAULT 0, -- Legacy simple stock
     price_adjustment DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id) ON DELETE RESTRICT,
-    INDEX idx_product_id (product_id),
-    INDEX idx_variant_sku (variant_sku),
-    INDEX idx_size_color (size, color),
-    INDEX idx_is_active (is_active),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     UNIQUE KEY uk_product_size_color (product_id, size, color)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 6. INVENTORY Table
+-- 7. INVENTORY Table (Advanced Stock)
 -- =====================================================
-CREATE TABLE INVENTORY (
+CREATE TABLE inventory (
     inventory_id INT AUTO_INCREMENT PRIMARY KEY,
-    variant_id INT NOT NULL,
-    store_id INT NOT NULL,
+    product_id INT NOT NULL,
+    variant_id INT DEFAULT NULL,
+    store_id INT NOT NULL DEFAULT 1,
     quantity_on_hand INT NOT NULL DEFAULT 0,
     reserved_quantity INT NOT NULL DEFAULT 0,
-    available_quantity INT NOT NULL DEFAULT 0,
-    adjusted_by INT,
     last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (variant_id) REFERENCES PRODUCT_VARIANT(variant_id) ON DELETE RESTRICT,
-    FOREIGN KEY (store_id) REFERENCES STORE(store_id) ON DELETE RESTRICT,
-    FOREIGN KEY (adjusted_by) REFERENCES USER(user_id) ON DELETE SET NULL,
-    INDEX idx_variant_id (variant_id),
-    INDEX idx_store_id (store_id),
-    INDEX idx_available_quantity (available_quantity),
-    INDEX idx_adjusted_by (adjusted_by),
-    UNIQUE KEY uk_variant_store (variant_id, store_id),
-    CONSTRAINT chk_quantity_on_hand CHECK (quantity_on_hand >= 0),
-    CONSTRAINT chk_reserved_quantity CHECK (reserved_quantity >= 0),
-    CONSTRAINT chk_available_quantity CHECK (available_quantity >= 0)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (variant_id) REFERENCES product_variants(variant_id) ON DELETE CASCADE,
+    FOREIGN KEY (store_id) REFERENCES stores(store_id) ON DELETE RESTRICT,
+    UNIQUE KEY uk_product_variant_store (product_id, variant_id, store_id)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 7. STOCK_ADJUSTMENT Table
+-- 8. ORDERS Table
 -- =====================================================
-CREATE TABLE STOCK_ADJUSTMENT (
-    adjustment_id INT AUTO_INCREMENT PRIMARY KEY,
-    inventory_id INT NOT NULL,
-    user_id INT NOT NULL,
-    adjustment_type ENUM('Initial', 'Addition', 'Deduction', 'Transfer') NOT NULL,
-    quantity_change INT NOT NULL,
-    reason VARCHAR(255),
-    reference_number VARCHAR(50),
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (inventory_id) REFERENCES INVENTORY(inventory_id) ON DELETE RESTRICT,
-    FOREIGN KEY (user_id) REFERENCES USER(user_id) ON DELETE RESTRICT,
-    INDEX idx_inventory_id (inventory_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_created_at (created_at),
-    INDEX idx_adjustment_type (adjustment_type)
-) ENGINE=InnoDB;
-
--- =====================================================
--- 8. STOCK_TRANSFER Table
--- =====================================================
-CREATE TABLE STOCK_TRANSFER (
-    transfer_id INT AUTO_INCREMENT PRIMARY KEY,
-    from_store_id INT NOT NULL,
-    to_store_id INT NOT NULL,
-    user_id INT NOT NULL,
-    status ENUM('Pending', 'In-Transit', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Pending',
-    transfer_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    completed_at DATETIME,
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL COMMENT 'Registered user (if any)',
+    sale_id INT DEFAULT NULL COMMENT 'Salesperson who created order',
+    customer_id INT DEFAULT NULL COMMENT 'CRM Customer ID',
+    store_id INT DEFAULT 1,
+    total_amount DECIMAL(15, 2) NOT NULL,
+    subtotal DECIMAL(15, 2) DEFAULT 0.00,
+    discount_amount DECIMAL(15, 2) DEFAULT 0.00,
+    tax_amount DECIMAL(15, 2) DEFAULT 0.00,
+    status ENUM('pending', 'confirmed', 'processing', 'shipped', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
+    payment_method ENUM('cod', 'cash', 'card', 'qr', 'transfer') NOT NULL DEFAULT 'cod',
+    shipping_address TEXT,
     notes TEXT,
-    FOREIGN KEY (from_store_id) REFERENCES STORE(store_id) ON DELETE RESTRICT,
-    FOREIGN KEY (to_store_id) REFERENCES STORE(store_id) ON DELETE RESTRICT,
-    FOREIGN KEY (user_id) REFERENCES USER(user_id) ON DELETE RESTRICT,
-    INDEX idx_from_store (from_store_id),
-    INDEX idx_to_store (to_store_id),
-    INDEX idx_user_id (user_id),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (sale_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
+    FOREIGN KEY (store_id) REFERENCES stores(store_id),
     INDEX idx_status (status),
-    INDEX idx_transfer_date (transfer_date),
-    CONSTRAINT chk_different_stores CHECK (from_store_id != to_store_id)
+    INDEX idx_sale_id (sale_id)
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 9. STOCK_TRANSFER_ITEM Table
+-- 9. ORDER_ITEMS Table
 -- =====================================================
-CREATE TABLE STOCK_TRANSFER_ITEM (
-    transfer_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    transfer_id INT NOT NULL,
-    variant_id INT NOT NULL,
+CREATE TABLE order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    variant_id INT DEFAULT NULL,
     quantity INT NOT NULL,
-    received_qty_on_hand INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (transfer_id) REFERENCES STOCK_TRANSFER(transfer_id) ON DELETE CASCADE,
-    FOREIGN KEY (variant_id) REFERENCES PRODUCT_VARIANT(variant_id) ON DELETE RESTRICT,
-    INDEX idx_transfer_id (transfer_id),
-    INDEX idx_variant_id (variant_id),
-    CONSTRAINT chk_transfer_quantity CHECK (quantity > 0),
-    CONSTRAINT chk_received_qty CHECK (received_qty_on_hand >= 0)
+    price DECIMAL(10, 2) NOT NULL,
+    discount_amount DECIMAL(10, 2) DEFAULT 0.00,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 10. PROMOTION Table
+-- 10. RETURNS Table
 -- =====================================================
-CREATE TABLE PROMOTION (
+CREATE TABLE returns (
+    return_id INT AUTO_INCREMENT PRIMARY KEY,
+    return_number VARCHAR(50) NOT NULL UNIQUE,
+    order_id INT NOT NULL,
+    user_id INT DEFAULT NULL COMMENT 'Admin/Sale processing return',
+    reason TEXT,
+    refund_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    items JSON, -- Store returned items snapshot
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- 11. PROMOTIONS Table
+-- =====================================================
+CREATE TABLE promotions (
     promotion_id INT AUTO_INCREMENT PRIMARY KEY,
     promotion_code VARCHAR(50) NOT NULL UNIQUE,
     promotion_name VARCHAR(100) NOT NULL,
@@ -200,195 +201,45 @@ CREATE TABLE PROMOTION (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_promotion_code (promotion_code),
-    INDEX idx_dates (start_date, end_date),
-    INDEX idx_is_active (is_active),
-    CONSTRAINT chk_discount_value CHECK (discount_value > 0),
-    CONSTRAINT chk_min_purchase CHECK (min_purchase_amount >= 0),
-    CONSTRAINT chk_date_range CHECK (start_date < end_date)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 -- =====================================================
--- 11. PROMOTION_PRODUCT Table
+-- 12. DATA SEEDING
 -- =====================================================
-CREATE TABLE PROMOTION_PRODUCT (
-    promotion_product_id INT AUTO_INCREMENT PRIMARY KEY,
-    promotion_id INT NOT NULL,
-    product_id INT NOT NULL,
-    apply_to ENUM('Product', 'Category') NOT NULL DEFAULT 'Product',
-    category_filter VARCHAR(50),
-    FOREIGN KEY (promotion_id) REFERENCES PROMOTION(promotion_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id) ON DELETE CASCADE,
-    INDEX idx_promotion_id (promotion_id),
-    INDEX idx_product_id (product_id),
-    UNIQUE KEY uk_promotion_product (promotion_id, product_id)
-) ENGINE=InnoDB;
 
--- =====================================================
--- 12. TRANSACTION Table
--- =====================================================
-CREATE TABLE `TRANSACTION` (
-    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-    transaction_number VARCHAR(50) NOT NULL UNIQUE,
-    customer_id INT,
-    user_id INT NOT NULL,
-    store_id INT NOT NULL,
-    promotion_id INT,
-    transaction_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    subtotal DECIMAL(10, 2) NOT NULL,
-    discount_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    tax_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    loyalty_points_earned INT NOT NULL DEFAULT 0,
-    loyalty_points_used INT NOT NULL DEFAULT 0,
-    status ENUM('Completed', 'Cancelled', 'Returned') NOT NULL DEFAULT 'Completed',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES USER(user_id) ON DELETE RESTRICT,
-    FOREIGN KEY (store_id) REFERENCES STORE(store_id) ON DELETE RESTRICT,
-    FOREIGN KEY (promotion_id) REFERENCES PROMOTION(promotion_id) ON DELETE SET NULL,
-    INDEX idx_transaction_number (transaction_number),
-    INDEX idx_customer_id (customer_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_store_id (store_id),
-    INDEX idx_transaction_date (transaction_date),
-    INDEX idx_status (status),
-    INDEX idx_store_date (store_id, transaction_date),
-    CONSTRAINT chk_subtotal CHECK (subtotal >= 0),
-    CONSTRAINT chk_discount CHECK (discount_amount >= 0),
-    CONSTRAINT chk_tax CHECK (tax_amount >= 0),
-    CONSTRAINT chk_total CHECK (total_amount >= 0),
-    CONSTRAINT chk_points_earned CHECK (loyalty_points_earned >= 0),
-    CONSTRAINT chk_points_used CHECK (loyalty_points_used >= 0)
-) ENGINE=InnoDB;
+-- Categories
+INSERT INTO categories (id, name) VALUES (1, 'Men'), (2, 'Women'), (3, 'Kids');
 
--- =====================================================
--- 13. TRANSACTION_ITEM Table
--- =====================================================
-CREATE TABLE TRANSACTION_ITEM (
-    transaction_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    transaction_id INT NOT NULL,
-    variant_id INT NOT NULL,
-    quantity INT NOT NULL,
-    unit_price DECIMAL(10, 2) NOT NULL,
-    discount_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    line_total DECIMAL(10, 2) NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (transaction_id) REFERENCES `TRANSACTION`(transaction_id) ON DELETE CASCADE,
-    FOREIGN KEY (variant_id) REFERENCES PRODUCT_VARIANT(variant_id) ON DELETE RESTRICT,
-    INDEX idx_transaction_id (transaction_id),
-    INDEX idx_variant_id (variant_id),
-    CONSTRAINT chk_item_quantity CHECK (quantity > 0),
-    CONSTRAINT chk_unit_price CHECK (unit_price >= 0),
-    CONSTRAINT chk_item_discount CHECK (discount_amount >= 0),
-    CONSTRAINT chk_line_total CHECK (line_total >= 0)
-) ENGINE=InnoDB;
+-- Store
+INSERT INTO stores (store_code, store_name, address, city) VALUES 
+('STORE001', 'Canifa - Cửa hàng chính', '123 Đường Nguyễn Huệ, Quận 1', 'Hồ Chí Minh');
 
--- =====================================================
--- 14. PAYMENT Table
--- =====================================================
-CREATE TABLE PAYMENT (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    transaction_id INT NOT NULL,
-    payment_method ENUM('Cash', 'Card', 'QR') NOT NULL,
-    amount_paid DECIMAL(10, 2) NOT NULL,
-    reference_number VARCHAR(100),
-    payment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (transaction_id) REFERENCES `TRANSACTION`(transaction_id) ON DELETE CASCADE,
-    INDEX idx_transaction_id (transaction_id),
-    INDEX idx_payment_method (payment_method),
-    INDEX idx_payment_date (payment_date),
-    CONSTRAINT chk_amount_paid CHECK (amount_paid > 0)
-) ENGINE=InnoDB;
+-- Users (Password: 123456 / Password123)
+-- Admin
+INSERT INTO users (username, password, email, role) VALUES 
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@example.com', 'admin');
 
--- =====================================================
--- 15. RETURN Table
--- =====================================================
-CREATE TABLE `RETURN` (
-    return_id INT AUTO_INCREMENT PRIMARY KEY,
-    return_number VARCHAR(50) NOT NULL UNIQUE,
-    transaction_id INT NOT NULL,
-    customer_id INT,
-    user_id INT NOT NULL,
-    store_id INT NOT NULL,
-    return_type ENUM('Return', 'Exchange') NOT NULL,
-    refund_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    reason TEXT,
-    status ENUM('Pending', 'Approved', 'Rejected', 'Completed') NOT NULL DEFAULT 'Pending',
-    return_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    processed_at DATETIME,
-    FOREIGN KEY (transaction_id) REFERENCES `TRANSACTION`(transaction_id) ON DELETE RESTRICT,
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES USER(user_id) ON DELETE RESTRICT,
-    FOREIGN KEY (store_id) REFERENCES STORE(store_id) ON DELETE RESTRICT,
-    INDEX idx_return_number (return_number),
-    INDEX idx_transaction_id (transaction_id),
-    INDEX idx_customer_id (customer_id),
-    INDEX idx_return_date (return_date),
-    INDEX idx_status (status),
-    CONSTRAINT chk_refund_amount CHECK (refund_amount >= 0)
-) ENGINE=InnoDB;
+-- Sales
+INSERT INTO users (username, password, email, role) VALUES 
+('saleuser', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'sale@example.com', 'sale');
 
--- =====================================================
--- 16. RETURN_ITEM Table
--- =====================================================
-CREATE TABLE RETURN_ITEM (
-    return_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    return_id INT NOT NULL,
-    variant_id INT NOT NULL,
-    transaction_item_id INT NOT NULL,
-    quantity INT NOT NULL,
-    refund_amount DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (return_id) REFERENCES `RETURN`(return_id) ON DELETE CASCADE,
-    FOREIGN KEY (variant_id) REFERENCES PRODUCT_VARIANT(variant_id) ON DELETE RESTRICT,
-    FOREIGN KEY (transaction_item_id) REFERENCES TRANSACTION_ITEM(transaction_item_id) ON DELETE RESTRICT,
-    INDEX idx_return_id (return_id),
-    INDEX idx_variant_id (variant_id),
-    INDEX idx_transaction_item_id (transaction_item_id),
-    CONSTRAINT chk_return_quantity CHECK (quantity > 0),
-    CONSTRAINT chk_return_refund CHECK (refund_amount >= 0)
-) ENGINE=InnoDB;
+-- Customer
+INSERT INTO users (username, password, email, role) VALUES 
+('customer_test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'customer@example.com', 'customer');
 
--- =====================================================
--- 17. LOYALTY_POINT Table
--- =====================================================
-CREATE TABLE LOYALTY_POINT (
-    point_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    transaction_id INT,
-    points_earned INT NOT NULL DEFAULT 0,
-    points_used INT NOT NULL DEFAULT 0,
-    points_balance INT NOT NULL,
-    transaction_type ENUM('Earn', 'Redeem', 'Adjustment') NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id) ON DELETE CASCADE,
-    FOREIGN KEY (transaction_id) REFERENCES `TRANSACTION`(transaction_id) ON DELETE SET NULL,
-    INDEX idx_customer_id (customer_id),
-    INDEX idx_transaction_id (transaction_id),
-    INDEX idx_created_at (created_at),
-    INDEX idx_transaction_type (transaction_type),
-    CONSTRAINT chk_points_earned CHECK (points_earned >= 0),
-    CONSTRAINT chk_points_used_loyalty CHECK (points_used >= 0),
-    CONSTRAINT chk_points_balance CHECK (points_balance >= 0)
-) ENGINE=InnoDB;
+-- Products
+INSERT INTO products (category_id, name, description, price, image, material, sku, barcode) VALUES
+(1, 'Áo Thun Nam Cotton', 'Basic cotton t-shirt', 199000, 'uploads/product_shirt_1.png', 'Cotton', 'SKU-001', '893001'),
+(2, 'Váy Nữ Mùa Hè', 'Summer dress', 450000, 'uploads/product_dress_1.png', 'Silk', 'SKU-002', '893002'),
+(3, 'Quần Short Bé Trai', 'Cool shorts', 150000, 'uploads/product_kids_1.png', 'Denim', 'SKU-003', '893003');
 
--- =====================================================
--- 18. AUDIT_LOG Table
--- =====================================================
-CREATE TABLE AUDIT_LOG (
-    log_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    action_type ENUM('Create', 'Update', 'Delete', 'Price Change', 'Stock Adjustment') NOT NULL,
-    entity_type VARCHAR(50) NOT NULL,
-    entity_id INT NOT NULL,
-    old_value TEXT,
-    new_value TEXT,
-    ip_address VARCHAR(45),
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES USER(user_id) ON DELETE RESTRICT,
-    INDEX idx_user_id (user_id),
-    INDEX idx_action_type (action_type),
-    INDEX idx_entity (entity_type, entity_id),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+-- Inventory for Product 8 (ID 8 might need to be specific if tests rely on it. Let's make sure ID 8 exists by inserting enough or forcing ID)
+-- Inserting dummy products to reach ID 8 if auto-increment starts at 1
+INSERT INTO products (id, category_id, name, description, price, image) VALUES
+(8, 1, 'Test Product ID 8', 'For Automated Testing', 100000, 'uploads/test_product.png')
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- Variants & Inventory for Product 8
+INSERT INTO product_variants (product_id, size, color, quantity) VALUES (8, 'L', 'Blue', 100);
+INSERT INTO inventory (product_id, store_id, quantity_on_hand) VALUES (8, 1, 50);

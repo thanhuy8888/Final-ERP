@@ -5,13 +5,17 @@ import { LanguageProvider } from './context/LanguageContext'
 import './index.css'
 import App from './App.jsx'
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <LanguageProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </LanguageProvider>
+    <ErrorBoundary>
+      <LanguageProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </LanguageProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
 

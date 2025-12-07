@@ -10,11 +10,13 @@ const ProtectedRoute = ({ children, adminOnly = false, saleOnly = false }) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (adminOnly && user.role !== 'admin') {
+    const role = user.role ? user.role.toLowerCase() : '';
+
+    if (adminOnly && role !== 'admin') {
         return <Navigate to="/" replace />;
     }
 
-    if (saleOnly && !['sale', 'admin'].includes(user.role)) {
+    if (saleOnly && !['sale', 'admin'].includes(role)) {
         return <Navigate to="/" replace />;
     }
 

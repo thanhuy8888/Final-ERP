@@ -17,7 +17,10 @@ const Login = () => {
         e.preventDefault();
         const result = await login(username, password);
         if (result.success) {
-            navigate('/');
+            const role = result.role ? result.role.toLowerCase() : 'customer';
+            if (role === 'admin') navigate('/admin');
+            else if (role === 'sale') navigate('/sale');
+            else navigate('/');
         } else {
             setError(result.message);
         }

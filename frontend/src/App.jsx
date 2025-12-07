@@ -5,9 +5,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
 // Lazy load layouts
-const AdminLayout = lazy(() => import('./components/AdminLayout'));
-const SaleLayout = lazy(() => import('./components/SaleLayout'));
-
 // Lazy load customer pages
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -18,6 +15,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const Orders = lazy(() => import('./pages/Orders'));
 
 // Lazy load admin pages
+const AdminLayout = lazy(() => import('./components/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminProducts = lazy(() => import('./pages/admin/Products'));
 const AdminOrders = lazy(() => import('./pages/admin/Orders'));
@@ -29,12 +27,14 @@ const AdminPromotions = lazy(() => import('./pages/admin/Promotions'));
 const AdminReports = lazy(() => import('./pages/admin/Reports'));
 const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
 
-// Lazy load sale pages
-const SaleDashboard = lazy(() => import('./pages/sale/Dashboard'));
-const SaleOrders = lazy(() => import('./pages/sale/Orders'));
-const SaleCustomers = lazy(() => import('./pages/sale/Customers'));
-const SaleNewOrder = lazy(() => import('./pages/sale/NewOrder'));
-const SaleReturns = lazy(() => import('./pages/sale/Returns'));
+// Direct import for debugging
+import SaleLayout from './components/SaleLayout';
+import SaleDashboard from './pages/sale/Dashboard';
+import SaleOrders from './pages/sale/Orders';
+import SaleCustomers from './pages/sale/Customers';
+import SaleNewOrder from './pages/sale/NewOrder';
+import SaleReturns from './pages/sale/Returns';
+import SaleStockLookup from './pages/sale/StockLookup';
 
 // Loading fallback component
 const PageLoader = () => (
@@ -87,6 +87,7 @@ function App() {
             <Route path="customers" element={<SaleCustomers />} />
             <Route path="new-order" element={<SaleNewOrder />} />
             <Route path="returns" element={<SaleReturns />} />
+
           </Route>
 
           {/* Admin Routes */}

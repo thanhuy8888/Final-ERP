@@ -24,6 +24,8 @@ const SaleLayout = ({ children }) => {
                     <Link to="/sale">📊 {t('sale.dashboard')}</Link>
                     <Link to="/sale/orders">🛒 {t('sale.myOrders')}</Link>
                     <Link to="/sale/customers">👥 {t('sale.customers')}</Link>
+                    <Link to="/sale/stock">📦 {t('sale.stockLookup') || 'Stock'}</Link>
+                    <Link to="/sale/returns">↩️ {t('sale.returns') || 'Returns'}</Link>
                     <Link to="/sale/new-order">➕ {t('sale.createOrder')}</Link>
                     <hr style={{ margin: '10px 0', border: 'none', borderTop: '1px solid #444' }} />
                     <button
