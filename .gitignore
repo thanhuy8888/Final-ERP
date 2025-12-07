@@ -1,8 +1,8 @@
 # Ignore uploaded files (can be large)
-uploads/*.png
-uploads/*.jpg
-uploads/*.jpeg
-uploads/*.gif
+# uploads/*.png
+# uploads/*.jpg
+# uploads/*.jpeg
+# uploads/*.gif
 
 # Keep the uploads folder
 !uploads/.gitkeep
@@ -20,8 +20,8 @@ Thumbs.db
 *.log
 
 # Dependencies
-vendor/
-frontend/node_modules/
+# vendor/
+# frontend/node_modules/
 
 # Cache
 cache/
