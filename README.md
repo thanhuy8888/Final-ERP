@@ -1,71 +1,102 @@
-# Canifa Clone - E-commerce Website
+# Final-ERP (Canifa Clone)
 
-Website thương mại điện tử theo mẫu Canifa, xây dựng bằng PHP với 2 khu vực riêng biệt:
-- **Portal Khách hàng**: Duyệt sản phẩm, giỏ hàng, thanh toán
-- **Portal Admin**: Quản lý sản phẩm, đơn hàng
+A comprehensive Fashion ERP System (Canifa Clone) featuring a modern React Frontend and a robust PHP Backend. It includes Customer, Sales Staff, and Administration portals.
 
-## Công nghệ sử dụng
-- **Backend**: PHP, MySQL
-- **Frontend**: HTML, CSS, JavaScript
-- **Database**: MySQL (HeidiSQL)
-- **Server**: Laragon
+![Tech Stack](https://skillicons.dev/icons?i=react,vite,php,mysql,html,css)
 
-## Cài đặt
+## 📂 Project Structure
 
-### 1. Import Database
-```bash
-# Mở HeidiSQL
-# Chạy file: database.sql
-# Chạy file: sample_products.sql
+```
+Final-ERP/
+├── api/               # PHP Backend API (RESTful)
+│   ├── admin/         # Admin endpoints (Products, Stats)
+│   ├── sale/          # Sales Staff endpoints (Stock, Orders)
+│   └── ...            # Public endpoints (Auth, Products)
+├── frontend/          # React Vite Application
+│   ├── src/
+│   │   ├── components/# Reusable UI components
+│   │   ├── context/   # Auth & Language Context
+│   │   ├── pages/     # Application Pages
+│   │   └── ...
+├── includes/          # Shared PHP Utilities (DB, Cache)
+├── uploads/           # Product component images
+└── erpiiiii.sql       # Consolidated Database Schema
 ```
 
-### 2. Cấu hình
-Kiểm tra file `includes/db.php` và cập nhật thông tin database nếu cần:
-```php
-$host = 'localhost';
-$db   = 'final_erp';
-$user = 'root';
-$pass = '';
-```
+## 🚀 Tech Stack
 
-### 3. Truy cập
-- **Khách hàng**: `http://localhost/Final ERP/`
-- **Admin**: `http://localhost/Final ERP/admin/`
+-   **Frontend**: React.js, Vite, Axios, React Router, Tailwind CSS (or Custom CSS).
+-   **Backend**: Native PHP 8.x, PDO (MySQL Authentication).
+-   **Database**: MySQL (MariaDB).
+-   **Caching**: File-based Caching (Redis-free).
+-   **Server**: XAMPP / Apache.
 
-## Tính năng
+## 🔑 Demo Accounts
 
-### Khách hàng
-- Trang chủ với sản phẩm nổi bật
-- Duyệt sản phẩm theo danh mục
-- Chi tiết sản phẩm
-- Giỏ hàng
-- Thanh toán
-- Đăng ký / Đăng nhập
+| Role | Username | Password | Access |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin` | `123456` | `/admin` - Dashboard, Products, Orders |
+| **Sales** | `saleuser` | `123456` | `/sale` - Stock Lookup, Manual Orders |
+| **Customer** | `customer_test` | `123456` | `/` - Home, Cart, Checkout |
 
-### Admin
-- Dashboard thống kê
-- Quản lý sản phẩm (Thêm, Sửa, Xóa)
-- Quản lý đơn hàng
-- Cập nhật trạng thái đơn hàng
+## 🛠️ Installation & Setup
 
-## Cấu trúc thư mục
-```
-Final ERP/
-├── admin/              # Khu vực admin
-├── assets/             # CSS, JS, Images
-├── includes/           # Shared PHP files
-├── uploads/            # Product images
-├── database.sql        # Database schema
-├── sample_products.sql # Sample data
-└── index.php           # Homepage
-```
+### 1. Prerequisites
+-   **XAMPP** (PHP 8.0+, MySQL/MariaDB)
+-   **Node.js** (v18+)
 
-## Demo Products
-Website đi kèm 7 sản phẩm mẫu:
-- Nam: Áo Thun, Quần Jean, Áo Blazer
-- Nữ: Váy Navy
-- Bé trai: Áo Thun, Quần Short
-- Bé gái: Váy Hồng
+### 2. Backend Setup
+1.  Clone the repository into `c:\xampp\htdocs\Final-ERP`.
+    ```bash
+    git clone https://github.com/thanhuy8888/Final-ERP.git .
+    ```
+2.  Start **Apache** and **MySQL** in XAMPP Control Panel.
+3.  Open [phpMyAdmin](http://localhost/phpmyadmin/).
+4.  Create a new database named `final_erp`.
+    *(Or simply import the file below which handles creation)*
+5.  Import `erpiiiii.sql` into the database.
+6.  Verify `includes/db.php` credentials:
+    ```php
+    $host = 'localhost';
+    $db   = 'final_erp';
+    $user = 'root';
+    $pass = ''; // Default XAMPP password is empty
+    ```
 
-## License
-MIT
+### 3. Frontend Setup
+1.  Navigate to the frontend folder:
+    ```bash
+    cd frontend
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+
+### 4. Access the Application
+-   **Frontend**: [http://localhost:5173](http://localhost:5173)
+-   **Backend API**: [http://localhost/Final-ERP/api](http://localhost/Final-ERP/api)
+
+## 📋 Features Checklist
+### Customer Portal
+-   [x] Account Registration/Login
+-   [x] Product Browsing & Search (Filter by Category, Price)
+-   [x] Shopping Cart & Checkout (COD)
+-   [x] Order History
+
+### Sales Staff Portal
+-   [x] Stock Lookup (Real-time Inventory)
+-   [x] Manual Order Creation (Walk-in Customers)
+-   [x] Returns & Exchanges
+
+### Admin Portal
+-   [x] Dashboard Analytics (Revenue, Top Products)
+-   [x] Product Management (CRUD, Variants)
+-   [x] Audit Logs
+
+## 📝 License
+This project is for educational purposes.
