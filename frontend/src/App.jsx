@@ -27,12 +27,14 @@ const AdminUsers = lazy(() => import('./pages/admin/Users'));
 const AdminInventory = lazy(() => import('./pages/admin/Inventory'));
 const AdminPromotions = lazy(() => import('./pages/admin/Promotions'));
 const AdminReports = lazy(() => import('./pages/admin/Reports'));
+const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
 
 // Lazy load sale pages
 const SaleDashboard = lazy(() => import('./pages/sale/Dashboard'));
 const SaleOrders = lazy(() => import('./pages/sale/Orders'));
 const SaleCustomers = lazy(() => import('./pages/sale/Customers'));
 const SaleNewOrder = lazy(() => import('./pages/sale/NewOrder'));
+const SaleReturns = lazy(() => import('./pages/sale/Returns'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -84,6 +86,7 @@ function App() {
             <Route path="orders" element={<SaleOrders />} />
             <Route path="customers" element={<SaleCustomers />} />
             <Route path="new-order" element={<SaleNewOrder />} />
+            <Route path="returns" element={<SaleReturns />} />
           </Route>
 
           {/* Admin Routes */}
@@ -102,6 +105,7 @@ function App() {
             <Route path="inventory" element={<AdminInventory />} />
             <Route path="promotions" element={<AdminPromotions />} />
             <Route path="reports" element={<AdminReports />} />
+            <Route path="audit-logs" element={<AuditLogs />} />
           </Route>
         </Routes>
       </Suspense>
