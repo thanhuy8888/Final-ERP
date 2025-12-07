@@ -1,6 +1,6 @@
-# Final-ERP (Canifa Clone)
+# Final-ERP 
 
-A comprehensive Fashion ERP System (Canifa Clone) featuring a modern React Frontend and a robust PHP Backend. It includes Customer, Sales Staff, and Administration portals.
+A comprehensive Fashion ERP System featuring a modern React Frontend and a robust PHP Backend. It includes Customer, Sales Staff, and Administration portals.
 
 ![Tech Stack](https://skillicons.dev/icons?i=react,vite,php,mysql,html,css)
 
