@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const AdminInventory = () => {
+    const { t } = useTranslation();
     const [inventory, setInventory] = useState([]);
     const [lowStock, setLowStock] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ const AdminInventory = () => {
                 fetchInventory();
             }
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Có lỗi xảy ra' });
+            setMessage({ type: 'error', text: error.response?.data?.error || 'Error' });
         }
     };
 
@@ -57,12 +59,12 @@ const AdminInventory = () => {
         setShowAdjustForm(true);
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>{t('common.loading')}</div>;
 
     return (
         <div>
             <div className="admin-header">
-                <h1>Quản lý tồn kho</h1>
+                <h1>{t('admin.inventoryManagement')}</h1>
             </div>
 
             {message.text && (
@@ -79,15 +81,15 @@ const AdminInventory = () => {
 
             {lowStock.length > 0 && (
                 <div className="admin-card" style={{ marginBottom: '20px', borderLeft: '4px solid #e74c3c' }}>
-                    <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>⚠️ Cảnh báo tồn kho thấp ({lowStock.length} sản phẩm)</h3>
+                    <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>⚠️ Low Stock Alert ({lowStock.length} {t('common.products')})</h3>
                     <table className="admin-table">
                         <thead>
                             <tr>
-                                <th>Sản phẩm</th>
-                                <th>Size/Màu</th>
-                                <th>Tồn kho</th>
-                                <th>Ngưỡng</th>
-                                <th>Hành động</th>
+                                <th>{t('admin.productName')}</th>
+                                <th>{t('product.size')}/{t('product.color')}</th>
+                                <th>{t('admin.stock')}</th>
+                                <th>Threshold</th>
+                                <th>{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -99,7 +101,7 @@ const AdminInventory = () => {
                                     <td>{item.low_stock_threshold}</td>
                                     <td>
                                         <button onClick={() => openAdjustForm(item)} className="btn-primary" style={{ padding: '5px 10px', fontSize: '12px' }}>
-                                            Nhập thêm
+                                            {t('admin.adjust')}
                                         </button>
                                     </td>
                                 </tr>
@@ -111,25 +113,25 @@ const AdminInventory = () => {
 
             {showAdjustForm && selectedItem && (
                 <div className="admin-card" style={{ marginBottom: '20px' }}>
-                    <h3>Điều chỉnh tồn kho: {selectedItem.product_name} ({selectedItem.size}/{selectedItem.color})</h3>
-                    <p>Tồn kho hiện tại: <strong>{selectedItem.quantity_on_hand}</strong></p>
+                    <h3>{t('admin.adjustStock')}: {selectedItem.product_name} ({selectedItem.size}/{selectedItem.color})</h3>
+                    <p>{t('admin.currentStock')}: <strong>{selectedItem.quantity_on_hand}</strong></p>
                     <form onSubmit={handleAdjust}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '15px', marginTop: '15px' }}>
                             <div>
-                                <label>Loại điều chỉnh</label>
+                                <label>Type</label>
                                 <select
                                     value={adjustData.adjustment_type}
                                     onChange={(e) => setAdjustData({ ...adjustData, adjustment_type: e.target.value })}
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 >
-                                    <option value="Addition">Nhập thêm</option>
-                                    <option value="Deduction">Giảm</option>
-                                    <option value="Initial">Nhập ban đầu</option>
-                                    <option value="Transfer">Chuyển kho</option>
+                                    <option value="Addition">Add</option>
+                                    <option value="Deduction">Deduct</option>
+                                    <option value="Initial">Initial</option>
+                                    <option value="Transfer">Transfer</option>
                                 </select>
                             </div>
                             <div>
-                                <label>Số lượng thay đổi</label>
+                                <label>{t('product.quantity')}</label>
                                 <input
                                     type="number"
                                     value={adjustData.quantity_change}
@@ -138,42 +140,41 @@ const AdminInventory = () => {
                                 />
                             </div>
                             <div>
-                                <label>Lý do</label>
+                                <label>Reason</label>
                                 <input
                                     type="text"
                                     value={adjustData.reason}
                                     onChange={(e) => setAdjustData({ ...adjustData, reason: e.target.value })}
-                                    placeholder="VD: Nhập hàng mới, Kiểm kê..."
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 />
                             </div>
                         </div>
                         <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-                            <button type="submit" className="btn-primary">Xác nhận</button>
+                            <button type="submit" className="btn-primary">{t('common.confirm')}</button>
                             <button type="button" onClick={() => setShowAdjustForm(false)} style={{
                                 padding: '10px 20px',
                                 border: '1px solid #ddd',
                                 borderRadius: '5px',
                                 background: 'white',
                                 cursor: 'pointer'
-                            }}>Hủy</button>
+                            }}>{t('common.cancel')}</button>
                         </div>
                     </form>
                 </div>
             )}
 
             <div className="admin-card">
-                <h3>Tổng quan tồn kho</h3>
+                <h3>{t('admin.inventory')}</h3>
                 <table className="admin-table">
                     <thead>
                         <tr>
-                            <th>Sản phẩm</th>
-                            <th>Size</th>
-                            <th>Màu</th>
-                            <th>Cửa hàng</th>
-                            <th>Tồn kho</th>
-                            <th>Đã đặt</th>
-                            <th>Hành động</th>
+                            <th>{t('admin.productName')}</th>
+                            <th>{t('product.size')}</th>
+                            <th>{t('product.color')}</th>
+                            <th>Store</th>
+                            <th>{t('admin.stock')}</th>
+                            <th>Reserved</th>
+                            <th>{t('admin.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -191,7 +192,7 @@ const AdminInventory = () => {
                                 </td>
                                 <td>{item.reserved_quantity || 0}</td>
                                 <td>
-                                    <button onClick={() => openAdjustForm(item)} className="btn-edit">📦 Điều chỉnh</button>
+                                    <button onClick={() => openAdjustForm(item)} className="btn-edit">📦 {t('admin.adjust')}</button>
                                 </td>
                             </tr>
                         ))}

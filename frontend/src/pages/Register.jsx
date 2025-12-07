@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import Navbar from '../components/Navbar';
 import './Register.css';
 
 const Register = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -25,12 +27,12 @@ const Register = () => {
         e.preventDefault();
 
         if (formData.password !== formData.confirm_password) {
-            setError('Mật khẩu xác nhận không khớp');
+            setError(t('register.passwordMismatch'));
             return;
         }
 
         if (formData.password.length < 6) {
-            setError('Mật khẩu phải có ít nhất 6 ký tự');
+            setError(t('register.passwordTooShort'));
             return;
         }
 
@@ -38,11 +40,11 @@ const Register = () => {
         try {
             const response = await api.post('/register.php', formData);
             if (response.data.success) {
-                setMessage('Đăng ký thành công! Đang chuyển hướng...');
+                setMessage(t('register.success'));
                 setTimeout(() => navigate('/login'), 2000);
             }
         } catch (error) {
-            setError(error.response?.data?.error || 'Đăng ký thất bại');
+            setError(error.response?.data?.error || t('register.failed'));
         } finally {
             setLoading(false);
         }
@@ -54,8 +56,8 @@ const Register = () => {
             <div className="register-container">
                 <div className="register-box">
                     <div className="register-header">
-                        <h2>TẠO TÀI KHOẢN</h2>
-                        <p>Đăng ký để nhận ưu đãi độc quyền</p>
+                        <h2>{t('register.title')}</h2>
+                        <p>{t('register.subtitle')}</p>
                     </div>
 
                     {error && <div className="error-message">{error}</div>}
@@ -63,7 +65,7 @@ const Register = () => {
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label>Tên đăng nhập</label>
+                            <label>{t('register.username')}</label>
                             <div className="input-wrapper">
                                 <span className="input-icon">👤</span>
                                 <input
@@ -71,14 +73,14 @@ const Register = () => {
                                     name="username"
                                     value={formData.username}
                                     onChange={handleChange}
-                                    placeholder="Nhập tên đăng nhập"
+                                    placeholder={t('register.usernamePlaceholder')}
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label>Email</label>
+                            <label>{t('register.email')}</label>
                             <div className="input-wrapper">
                                 <span className="input-icon">📧</span>
                                 <input
@@ -86,7 +88,7 @@ const Register = () => {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder="Nhập email của bạn"
+                                    placeholder={t('register.emailPlaceholder')}
                                     required
                                 />
                             </div>
@@ -94,7 +96,7 @@ const Register = () => {
 
                         <div className="form-row">
                             <div className="form-group half">
-                                <label>Mật khẩu</label>
+                                <label>{t('register.password')}</label>
                                 <div className="input-wrapper">
                                     <span className="input-icon">🔒</span>
                                     <input
@@ -102,14 +104,14 @@ const Register = () => {
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
-                                        placeholder="Tối thiểu 6 ký tự"
+                                        placeholder={t('register.passwordPlaceholder')}
                                         required
                                     />
                                 </div>
                             </div>
 
                             <div className="form-group half">
-                                <label>Xác nhận mật khẩu</label>
+                                <label>{t('register.confirmPassword')}</label>
                                 <div className="input-wrapper">
                                     <span className="input-icon">🔒</span>
                                     <input
@@ -117,7 +119,7 @@ const Register = () => {
                                         name="confirm_password"
                                         value={formData.confirm_password}
                                         onChange={handleChange}
-                                        placeholder="Nhập lại mật khẩu"
+                                        placeholder={t('register.confirmPlaceholder')}
                                         required
                                     />
                                 </div>
@@ -128,20 +130,20 @@ const Register = () => {
                             {loading ? (
                                 <>
                                     <span className="spinner"></span>
-                                    Đang xử lý...
+                                    {t('register.processing')}
                                 </>
                             ) : (
-                                'ĐĂNG KÝ NGAY'
+                                t('register.submit')
                             )}
                         </button>
                     </form>
 
                     <div className="divider">
-                        <span>hoặc</span>
+                        <span>{t('register.or')}</span>
                     </div>
 
                     <p className="switch-text">
-                        Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+                        {t('register.hasAccount')} <Link to="/login">{t('register.loginNow')}</Link>
                     </p>
                 </div>
             </div>

@@ -131,6 +131,28 @@
     box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3);
 }
 
+.lang-toggle {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.lang-toggle:hover {
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    border-color: #E31E24;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
     .navbar-container {

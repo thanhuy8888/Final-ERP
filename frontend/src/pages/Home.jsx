@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useTranslation } from '../hooks/useTranslation';
 import './Home.css';
 
 const Home = () => {
+    const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -76,15 +78,15 @@ const Home = () => {
 
             <section className="hero-section">
                 <div className="hero-content">
-                    <h1>THỜI TRANG CHO MỌI NGƯỜI</h1>
-                    <p>Khám phá bộ sưu tập mới nhất với chất liệu cao cấp</p>
-                    <Link to="/" className="btn-shop-now">MUA NGAY</Link>
+                    <h1>{t('home.heroTitle')}</h1>
+                    <p>{t('home.heroSubtitle')}</p>
+                    <Link to="/" className="btn-shop-now">{t('home.shopNow')}</Link>
                 </div>
             </section>
 
             <section className="products-section">
                 <div className="container">
-                    <h2 className="section-title">SẢN PHẨM MỚI</h2>
+                    <h2 className="section-title">{t('home.newProducts')}</h2>
 
                     {/* Search and Filter Bar */}
                     <div className="filter-bar">
@@ -92,7 +94,7 @@ const Home = () => {
                             <span className="search-icon">🔍</span>
                             <input
                                 type="text"
-                                placeholder="Tìm kiếm sản phẩm..."
+                                placeholder={t('home.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -107,10 +109,10 @@ const Home = () => {
                                 onChange={(e) => setPriceFilter(e.target.value)}
                                 className="filter-select"
                             >
-                                <option value="all">Tất cả giá</option>
-                                <option value="500000">Dưới 500.000đ</option>
-                                <option value="500000-1000000">500.000đ - 1.000.000đ</option>
-                                <option value="1000000">Trên 1.000.000đ</option>
+                                <option value="all">{t('home.allPrices')}</option>
+                                <option value="500000">{t('home.under500k')}</option>
+                                <option value="500000-1000000">{t('home.500kTo1m')}</option>
+                                <option value="1000000">{t('home.over1m')}</option>
                             </select>
 
                             <select
@@ -118,10 +120,10 @@ const Home = () => {
                                 onChange={(e) => setSortBy(e.target.value)}
                                 className="filter-select"
                             >
-                                <option value="newest">Mới nhất</option>
-                                <option value="price-low">Giá thấp → cao</option>
-                                <option value="price-high">Giá cao → thấp</option>
-                                <option value="name">Tên A-Z</option>
+                                <option value="newest">{t('home.newest')}</option>
+                                <option value="price-low">{t('home.priceLowHigh')}</option>
+                                <option value="price-high">{t('home.priceHighLow')}</option>
+                                <option value="name">{t('home.nameAZ')}</option>
                             </select>
                         </div>
                     </div>
@@ -129,9 +131,9 @@ const Home = () => {
                     {/* Results count */}
                     {(searchTerm || priceFilter !== 'all') && (
                         <div className="filter-results">
-                            <span>Tìm thấy {filteredProducts.length} sản phẩm</span>
+                            <span>{t('home.found')} {filteredProducts.length} {t('common.products')}</span>
                             <button className="btn-clear-filters" onClick={clearFilters}>
-                                Xóa bộ lọc
+                                {t('common.clearFilters')}
                             </button>
                         </div>
                     )}
@@ -139,13 +141,13 @@ const Home = () => {
                     {loading ? (
                         <div className="loading-container">
                             <div className="loading-spinner"></div>
-                            <p>Đang tải sản phẩm...</p>
+                            <p>{t('home.loadingProducts')}</p>
                         </div>
                     ) : filteredProducts.length === 0 ? (
                         <div className="no-products">
-                            <p>Không tìm thấy sản phẩm nào</p>
+                            <p>{t('home.noProducts')}</p>
                             <button className="btn-clear-filters" onClick={clearFilters}>
-                                Xóa bộ lọc
+                                {t('common.clearFilters')}
                             </button>
                         </div>
                     ) : (
@@ -157,7 +159,7 @@ const Home = () => {
                                     </div>
                                     <div className="product-info">
                                         <h3 className="product-name">{product.name}</h3>
-                                        <p className="product-price">{parseInt(product.price).toLocaleString()}đ</p>
+                                        <p className="product-price">{parseInt(product.price).toLocaleString()}{t('common.currency')}</p>
                                     </div>
                                 </Link>
                             ))}
@@ -171,11 +173,11 @@ const Home = () => {
                     <div className="footer-content">
                         <div className="footer-brand">
                             <h3>CANIFA</h3>
-                            <p>Thời trang cho mọi người</p>
+                            <p>{t('home.footerSlogan')}</p>
                         </div>
                         <div className="footer-links">
-                            <Link to="/orders">Đơn hàng của tôi</Link>
-                            <Link to="/cart">Giỏ hàng</Link>
+                            <Link to="/orders">{t('home.myOrders')}</Link>
+                            <Link to="/cart">{t('navbar.cart')}</Link>
                         </div>
                     </div>
                     <p className="copyright">&copy; 2024 CANIFA. All rights reserved.</p>

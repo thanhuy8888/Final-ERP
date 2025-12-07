@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const AdminPromotions = () => {
+    const { t } = useTranslation();
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -49,7 +51,7 @@ const AdminPromotions = () => {
                 fetchPromotions();
             }
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Có lỗi xảy ra' });
+            setMessage({ type: 'error', text: error.response?.data?.error || 'Error' });
         }
     };
 
@@ -72,12 +74,12 @@ const AdminPromotions = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('Bạn có chắc muốn xóa khuyến mãi này?')) return;
+        if (!confirm(t('common.delete') + '?')) return;
         try {
             await api.delete('/admin/promotions.php', { data: { promotion_id: id } });
             fetchPromotions();
         } catch (error) {
-            setMessage({ type: 'error', text: 'Xóa thất bại' });
+            setMessage({ type: 'error', text: 'Delete failed' });
         }
     };
 
@@ -105,28 +107,28 @@ const AdminPromotions = () => {
         const end = new Date(promo.end_date);
 
         if (!promo.is_active) {
-            return <span style={{ background: '#95a5a6', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>Tắt</span>;
+            return <span style={{ background: '#95a5a6', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>Disabled</span>;
         }
         if (now < start) {
-            return <span style={{ background: '#f39c12', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>Sắp diễn ra</span>;
+            return <span style={{ background: '#f39c12', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>{t('admin.promoStatus.upcoming')}</span>;
         }
         if (now > end) {
-            return <span style={{ background: '#e74c3c', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>Hết hạn</span>;
+            return <span style={{ background: '#e74c3c', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>{t('admin.promoStatus.expired')}</span>;
         }
-        return <span style={{ background: '#2ecc71', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>Đang chạy</span>;
+        return <span style={{ background: '#2ecc71', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>{t('admin.promoStatus.active')}</span>;
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>{t('common.loading')}</div>;
 
     return (
         <div>
             <div className="admin-header">
-                <h1>Quản lý khuyến mãi</h1>
+                <h1>{t('admin.promoList')}</h1>
                 <button className="btn-primary" onClick={() => {
                     setShowForm(true);
                     setEditingPromo(null);
                     resetForm();
-                }}>+ Thêm khuyến mãi</button>
+                }}>+ {t('admin.addPromo')}</button>
             </div>
 
             {message.text && (
@@ -143,22 +145,22 @@ const AdminPromotions = () => {
 
             {showForm && (
                 <div className="admin-card" style={{ marginBottom: '20px' }}>
-                    <h3>{editingPromo ? 'Chỉnh sửa khuyến mãi' : 'Thêm khuyến mãi mới'}</h3>
+                    <h3>{editingPromo ? t('common.edit') : t('admin.addPromo')}</h3>
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                             <div>
-                                <label>Mã khuyến mãi *</label>
+                                <label>{t('admin.promoCode')} *</label>
                                 <input
                                     type="text"
                                     value={formData.promotion_code}
                                     onChange={(e) => setFormData({ ...formData, promotion_code: e.target.value.toUpperCase() })}
                                     required
-                                    placeholder="VD: SALE20, NEWYEAR"
+                                    placeholder="SALE20, NEWYEAR"
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 />
                             </div>
                             <div>
-                                <label>Tên khuyến mãi *</label>
+                                <label>Name *</label>
                                 <input
                                     type="text"
                                     value={formData.promotion_name}
@@ -168,29 +170,28 @@ const AdminPromotions = () => {
                                 />
                             </div>
                             <div>
-                                <label>Loại giảm giá *</label>
+                                <label>{t('admin.discountType')} *</label>
                                 <select
                                     value={formData.discount_type}
                                     onChange={(e) => setFormData({ ...formData, discount_type: e.target.value })}
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 >
-                                    <option value="Percentage">Phần trăm (%)</option>
-                                    <option value="Fixed Amount">Số tiền cố định (VNĐ)</option>
+                                    <option value="Percentage">{t('admin.percent')} (%)</option>
+                                    <option value="Fixed Amount">{t('admin.fixed')} (VND)</option>
                                 </select>
                             </div>
                             <div>
-                                <label>Giá trị giảm *</label>
+                                <label>{t('admin.discount')} *</label>
                                 <input
                                     type="number"
                                     value={formData.discount_value}
                                     onChange={(e) => setFormData({ ...formData, discount_value: e.target.value })}
                                     required
-                                    placeholder={formData.discount_type === 'Percentage' ? 'VD: 10' : 'VD: 50000'}
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 />
                             </div>
                             <div>
-                                <label>Đơn tối thiểu</label>
+                                <label>{t('admin.minOrder')}</label>
                                 <input
                                     type="number"
                                     value={formData.min_purchase_amount}
@@ -200,17 +201,16 @@ const AdminPromotions = () => {
                                 />
                             </div>
                             <div>
-                                <label>Giảm tối đa (nếu %)</label>
+                                <label>Max Discount</label>
                                 <input
                                     type="number"
                                     value={formData.max_discount_amount}
                                     onChange={(e) => setFormData({ ...formData, max_discount_amount: e.target.value })}
-                                    placeholder="Không giới hạn"
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 />
                             </div>
                             <div>
-                                <label>Bắt đầu *</label>
+                                <label>{t('admin.startDate')} *</label>
                                 <input
                                     type="datetime-local"
                                     value={formData.start_date}
@@ -220,7 +220,7 @@ const AdminPromotions = () => {
                                 />
                             </div>
                             <div>
-                                <label>Kết thúc *</label>
+                                <label>{t('admin.endDate')} *</label>
                                 <input
                                     type="datetime-local"
                                     value={formData.end_date}
@@ -230,7 +230,7 @@ const AdminPromotions = () => {
                                 />
                             </div>
                             <div style={{ gridColumn: 'span 2' }}>
-                                <label>Mô tả</label>
+                                <label>{t('admin.description')}</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -241,7 +241,7 @@ const AdminPromotions = () => {
                         </div>
                         <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
                             <button type="submit" className="btn-primary">
-                                {editingPromo ? 'Cập nhật' : 'Thêm mới'}
+                                {editingPromo ? t('common.save') : t('common.add')}
                             </button>
                             <button type="button" onClick={() => setShowForm(false)} style={{
                                 padding: '10px 20px',
@@ -249,7 +249,7 @@ const AdminPromotions = () => {
                                 borderRadius: '5px',
                                 background: 'white',
                                 cursor: 'pointer'
-                            }}>Hủy</button>
+                            }}>{t('common.cancel')}</button>
                         </div>
                     </form>
                 </div>
@@ -259,13 +259,13 @@ const AdminPromotions = () => {
                 <table className="admin-table">
                     <thead>
                         <tr>
-                            <th>Mã</th>
-                            <th>Tên</th>
-                            <th>Giảm giá</th>
-                            <th>Đơn tối thiểu</th>
-                            <th>Thời gian</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <th>{t('admin.promoCode')}</th>
+                            <th>Name</th>
+                            <th>{t('admin.discount')}</th>
+                            <th>{t('admin.minOrder')}</th>
+                            <th>Duration</th>
+                            <th>{t('admin.status')}</th>
+                            <th>{t('admin.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -276,9 +276,9 @@ const AdminPromotions = () => {
                                 <td>
                                     {promo.discount_type === 'Percentage'
                                         ? `${promo.discount_value}%`
-                                        : `${parseInt(promo.discount_value).toLocaleString()}đ`}
+                                        : `${parseInt(promo.discount_value).toLocaleString()}${t('common.currency')}`}
                                 </td>
-                                <td>{parseInt(promo.min_purchase_amount).toLocaleString()}đ</td>
+                                <td>{parseInt(promo.min_purchase_amount).toLocaleString()}{t('common.currency')}</td>
                                 <td style={{ fontSize: '12px' }}>
                                     {new Date(promo.start_date).toLocaleDateString('vi-VN')}<br />
                                     → {new Date(promo.end_date).toLocaleDateString('vi-VN')}

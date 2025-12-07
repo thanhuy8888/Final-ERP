@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Line, Pie, Bar } from 'react-chartjs-2';
 import api from '../../api/axios';
+import { useTranslation } from '../../hooks/useTranslation';
 import './Dashboard.css';
 
 // Register Chart.js components
@@ -31,6 +32,7 @@ ChartJS.register(
 );
 
 const AdminDashboard = () => {
+    const { t } = useTranslation();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -53,7 +55,7 @@ const AdminDashboard = () => {
         return (
             <div className="dashboard-loading">
                 <div className="loading-spinner"></div>
-                <span>Đang tải dữ liệu...</span>
+                <span>{t('admin.loading')}</span>
             </div>
         );
     }
@@ -66,7 +68,7 @@ const AdminDashboard = () => {
         }) || [],
         datasets: [
             {
-                label: 'Doanh thu (VNĐ)',
+                label: t('admin.revenueVnd'),
                 data: stats?.daily_revenue?.map(d => Number(d.revenue)) || [],
                 fill: true,
                 backgroundColor: 'rgba(227, 30, 36, 0.1)',
@@ -90,7 +92,7 @@ const AdminDashboard = () => {
             tooltip: {
                 callbacks: {
                     label: (context) => {
-                        return `${Number(context.raw).toLocaleString('vi-VN')}đ`;
+                        return `${Number(context.raw).toLocaleString('vi-VN')}${t('common.currency')}`;
                     }
                 }
             }
@@ -118,15 +120,8 @@ const AdminDashboard = () => {
         cancelled: '#e74c3c'
     };
 
-    const statusLabels = {
-        pending: 'Chờ xử lý',
-        processing: 'Đang xử lý',
-        completed: 'Hoàn thành',
-        cancelled: 'Đã hủy'
-    };
-
     const orderStatusData = {
-        labels: stats?.order_status?.map(s => statusLabels[s.status] || s.status) || [],
+        labels: stats?.order_status?.map(s => t(`admin.statusLabels.${s.status}`)) || [],
         datasets: [
             {
                 data: stats?.order_status?.map(s => Number(s.count)) || [],
@@ -158,7 +153,7 @@ const AdminDashboard = () => {
         ) || [],
         datasets: [
             {
-                label: 'Đã bán',
+                label: t('admin.sold'),
                 data: stats?.top_products?.map(p => Number(p.total_sold)) || [],
                 backgroundColor: [
                     'rgba(227, 30, 36, 0.8)',
@@ -196,43 +191,32 @@ const AdminDashboard = () => {
     };
 
     const formatPrice = (price) => {
-        return Number(price).toLocaleString('vi-VN') + 'đ';
-    };
-
-    const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        return date.toLocaleString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        return Number(price).toLocaleString('vi-VN') + t('common.currency');
     };
 
     return (
         <div className="dashboard-container">
             <div className="dashboard-header">
-                <h1>📊 Dashboard</h1>
-                <p>Tổng quan hoạt động kinh doanh</p>
+                <h1>📊 {t('admin.dashboard')}</h1>
+                <p>{t('admin.overview')}</p>
             </div>
 
             {/* Stats Cards */}
             <div className="stats-grid">
                 <div className="stat-card products">
-                    <h3>📦 Sản phẩm</h3>
+                    <h3>📦 {t('admin.products')}</h3>
                     <p className="stat-value">{stats?.product_count || 0}</p>
                 </div>
                 <div className="stat-card orders">
-                    <h3>🛒 Đơn hàng</h3>
+                    <h3>🛒 {t('admin.orders')}</h3>
                     <p className="stat-value">{stats?.order_count || 0}</p>
                 </div>
                 <div className="stat-card customers">
-                    <h3>👥 Khách hàng</h3>
+                    <h3>👥 {t('admin.customers')}</h3>
                     <p className="stat-value">{stats?.customer_count || 0}</p>
                 </div>
                 <div className="stat-card revenue">
-                    <h3>💰 Doanh thu</h3>
+                    <h3>💰 {t('admin.revenue')}</h3>
                     <p className="stat-value">{formatPrice(stats?.revenue || 0)}</p>
                 </div>
             </div>
@@ -240,27 +224,27 @@ const AdminDashboard = () => {
             {/* Charts Section */}
             <div className="charts-section">
                 <div className="chart-card">
-                    <h3>📈 Doanh thu 7 ngày gần nhất</h3>
+                    <h3>📈 {t('admin.revenueChart')}</h3>
                     <div className="chart-container">
                         {stats?.daily_revenue?.length > 0 ? (
                             <Line data={revenueChartData} options={revenueChartOptions} />
                         ) : (
                             <div className="empty-state">
                                 <div className="empty-state-icon">📊</div>
-                                <p>Chưa có dữ liệu doanh thu</p>
+                                <p>{t('admin.noRevenueData')}</p>
                             </div>
                         )}
                     </div>
                 </div>
                 <div className="chart-card">
-                    <h3>📋 Trạng thái đơn hàng</h3>
+                    <h3>📋 {t('admin.orderStatus')}</h3>
                     <div className="chart-container">
                         {stats?.order_status?.length > 0 ? (
                             <Pie data={orderStatusData} options={pieOptions} />
                         ) : (
                             <div className="empty-state">
                                 <div className="empty-state-icon">🛒</div>
-                                <p>Chưa có đơn hàng</p>
+                                <p>{t('admin.noOrders')}</p>
                             </div>
                         )}
                     </div>
@@ -271,15 +255,15 @@ const AdminDashboard = () => {
             <div className="bottom-section">
                 {/* Recent Orders */}
                 <div className="recent-orders-card">
-                    <h3>🕐 Đơn hàng gần đây</h3>
+                    <h3>🕐 {t('admin.recentOrders')}</h3>
                     {stats?.recent_orders?.length > 0 ? (
                         <table className="orders-table">
                             <thead>
                                 <tr>
-                                    <th>Mã ĐH</th>
-                                    <th>Khách hàng</th>
-                                    <th>Tổng tiền</th>
-                                    <th>Trạng thái</th>
+                                    <th>{t('admin.orderId')}</th>
+                                    <th>{t('admin.customer')}</th>
+                                    <th>{t('admin.totalAmount')}</th>
+                                    <th>{t('admin.status')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -290,7 +274,7 @@ const AdminDashboard = () => {
                                         <td>{formatPrice(order.total_amount)}</td>
                                         <td>
                                             <span className={getStatusClass(order.status)}>
-                                                {statusLabels[order.status] || order.status}
+                                                {t(`admin.statusLabels.${order.status}`)}
                                             </span>
                                         </td>
                                     </tr>
@@ -300,21 +284,21 @@ const AdminDashboard = () => {
                     ) : (
                         <div className="empty-state">
                             <div className="empty-state-icon">📭</div>
-                            <p>Chưa có đơn hàng nào</p>
+                            <p>{t('admin.noOrdersYet')}</p>
                         </div>
                     )}
                 </div>
 
                 {/* Top Products */}
                 <div className="top-products-card">
-                    <h3>🏆 Top sản phẩm bán chạy</h3>
+                    <h3>🏆 {t('admin.topProducts')}</h3>
                     <div className="chart-container">
                         {stats?.top_products?.length > 0 ? (
                             <Bar data={topProductsData} options={barOptions} />
                         ) : (
                             <div className="empty-state">
                                 <div className="empty-state-icon">📦</div>
-                                <p>Chưa có dữ liệu bán hàng</p>
+                                <p>{t('admin.noSalesData')}</p>
                             </div>
                         )}
                     </div>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const AdminUsers = () => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -45,7 +47,7 @@ const AdminUsers = () => {
                 fetchUsers();
             }
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Có lỗi xảy ra' });
+            setMessage({ type: 'error', text: error.response?.data?.error || 'Error' });
         }
     };
 
@@ -64,12 +66,12 @@ const AdminUsers = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('Bạn có chắc muốn xóa người dùng này?')) return;
+        if (!confirm(t('common.delete') + '?')) return;
         try {
             await api.delete('/admin/users.php', { data: { id } });
             fetchUsers();
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Xóa thất bại' });
+            setMessage({ type: 'error', text: error.response?.data?.error || 'Delete failed' });
         }
     };
 
@@ -91,6 +93,11 @@ const AdminUsers = () => {
             sales: '#3498db',
             customer: '#2ecc71'
         };
+        const labels = {
+            admin: t('admin.roleAdmin'),
+            sales: 'Sales',
+            customer: t('admin.roleUser')
+        };
         return (
             <span style={{
                 background: colors[role] || '#95a5a6',
@@ -99,22 +106,22 @@ const AdminUsers = () => {
                 borderRadius: '12px',
                 fontSize: '12px'
             }}>
-                {role.toUpperCase()}
+                {labels[role] || role.toUpperCase()}
             </span>
         );
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>{t('common.loading')}</div>;
 
     return (
         <div>
             <div className="admin-header">
-                <h1>Quản lý người dùng</h1>
+                <h1>{t('admin.userList')}</h1>
                 <button className="btn-primary" onClick={() => {
                     setShowForm(true);
                     setEditingUser(null);
                     resetForm();
-                }}>+ Thêm người dùng</button>
+                }}>+ {t('admin.addUser')}</button>
             </div>
 
             {message.text && (
@@ -131,11 +138,11 @@ const AdminUsers = () => {
 
             {showForm && (
                 <div className="admin-card" style={{ marginBottom: '20px' }}>
-                    <h3>{editingUser ? 'Chỉnh sửa người dùng' : 'Thêm người dùng mới'}</h3>
+                    <h3>{editingUser ? t('common.edit') : t('admin.addUser')}</h3>
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                             <div>
-                                <label>Tên đăng nhập *</label>
+                                <label>{t('login.username')} *</label>
                                 <input
                                     type="text"
                                     value={formData.username}
@@ -155,7 +162,7 @@ const AdminUsers = () => {
                                 />
                             </div>
                             <div>
-                                <label>Mật khẩu {editingUser ? '(để trống nếu không đổi)' : '*'}</label>
+                                <label>{t('login.password')} *</label>
                                 <input
                                     type="password"
                                     value={formData.password}
@@ -165,7 +172,7 @@ const AdminUsers = () => {
                                 />
                             </div>
                             <div>
-                                <label>Họ tên</label>
+                                <label>{t('checkout.fullName')}</label>
                                 <input
                                     type="text"
                                     value={formData.full_name}
@@ -174,7 +181,7 @@ const AdminUsers = () => {
                                 />
                             </div>
                             <div>
-                                <label>Số điện thoại</label>
+                                <label>{t('checkout.phone')}</label>
                                 <input
                                     type="text"
                                     value={formData.phone}
@@ -183,21 +190,21 @@ const AdminUsers = () => {
                                 />
                             </div>
                             <div>
-                                <label>Vai trò *</label>
+                                <label>{t('admin.role')} *</label>
                                 <select
                                     value={formData.role}
                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                     style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                                 >
-                                    <option value="customer">Khách hàng</option>
-                                    <option value="sales">Nhân viên bán hàng</option>
-                                    <option value="admin">Quản trị viên</option>
+                                    <option value="customer">{t('admin.roleUser')}</option>
+                                    <option value="sales">Sales</option>
+                                    <option value="admin">{t('admin.roleAdmin')}</option>
                                 </select>
                             </div>
                         </div>
                         <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
                             <button type="submit" className="btn-primary">
-                                {editingUser ? 'Cập nhật' : 'Thêm mới'}
+                                {editingUser ? t('common.save') : t('common.add')}
                             </button>
                             <button type="button" onClick={() => setShowForm(false)} style={{
                                 padding: '10px 20px',
@@ -205,7 +212,7 @@ const AdminUsers = () => {
                                 borderRadius: '5px',
                                 background: 'white',
                                 cursor: 'pointer'
-                            }}>Hủy</button>
+                            }}>{t('common.cancel')}</button>
                         </div>
                     </form>
                 </div>
@@ -216,12 +223,12 @@ const AdminUsers = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Tên đăng nhập</th>
+                            <th>{t('login.username')}</th>
                             <th>Email</th>
-                            <th>Họ tên</th>
-                            <th>Vai trò</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <th>{t('checkout.fullName')}</th>
+                            <th>{t('admin.role')}</th>
+                            <th>{t('admin.status')}</th>
+                            <th>{t('admin.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -236,7 +243,7 @@ const AdminUsers = () => {
                                     <span style={{
                                         color: user.is_active ? '#2ecc71' : '#e74c3c'
                                     }}>
-                                        {user.is_active ? '✓ Hoạt động' : '✗ Khóa'}
+                                        {user.is_active ? '✓ Active' : '✗ Locked'}
                                     </span>
                                 </td>
                                 <td>

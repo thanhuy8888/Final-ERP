@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const ProductForm = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -57,14 +59,14 @@ const ProductForm = () => {
                 setTimeout(() => navigate('/admin/products'), 1500);
             }
         } catch (error) {
-            setError(error.response?.data?.error || 'Có lỗi xảy ra');
+            setError(error.response?.data?.error || 'Error');
         }
     };
 
     return (
         <div>
             <div className="admin-header">
-                <h1>{id ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</h1>
+                <h1>{id ? t('admin.editProduct') : t('admin.addProduct')}</h1>
             </div>
 
             <div className="admin-card" style={{ maxWidth: '600px' }}>
@@ -73,7 +75,7 @@ const ProductForm = () => {
 
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '15px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Tên sản phẩm:</label>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>{t('admin.productName')}:</label>
                         <input
                             type="text"
                             name="name"
@@ -85,7 +87,7 @@ const ProductForm = () => {
                     </div>
 
                     <div style={{ marginBottom: '15px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Mô tả:</label>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>{t('admin.description')}:</label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -96,7 +98,7 @@ const ProductForm = () => {
                     </div>
 
                     <div style={{ marginBottom: '15px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Giá:</label>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>{t('admin.price')}:</label>
                         <input
                             type="number"
                             name="price"
@@ -108,22 +110,22 @@ const ProductForm = () => {
                     </div>
 
                     <div style={{ marginBottom: '15px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Danh mục:</label>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Category:</label>
                         <select
                             name="category_id"
                             value={formData.category_id}
                             onChange={handleChange}
                             style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                         >
-                            <option value="1">Nam</option>
-                            <option value="2">Nữ</option>
-                            <option value="3">Bé trai</option>
-                            <option value="4">Bé gái</option>
+                            <option value="1">{t('navbar.men')}</option>
+                            <option value="2">{t('navbar.women')}</option>
+                            <option value="3">{t('navbar.kids')}</option>
+                            <option value="4">{t('navbar.kids')}</option>
                         </select>
                     </div>
 
                     <div style={{ marginBottom: '15px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>URL Hình ảnh:</label>
+                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>{t('admin.image')} URL:</label>
                         <input
                             type="text"
                             name="image"
@@ -135,9 +137,9 @@ const ProductForm = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <button type="submit" className="btn-primary">{id ? 'Cập nhật' : 'Thêm sản phẩm'}</button>
+                        <button type="submit" className="btn-primary">{id ? t('common.save') : t('admin.addProduct')}</button>
                         <button type="button" onClick={() => navigate('/admin/products')} style={{ padding: '10px 20px', border: '1px solid #ddd', borderRadius: '5px', background: 'white', cursor: 'pointer' }}>
-                            Hủy
+                            {t('common.cancel')}
                         </button>
                     </div>
                 </form>

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
+import { useTranslation } from '../hooks/useTranslation';
 import Navbar from '../components/Navbar';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [variants, setVariants] = useState([]);
@@ -69,12 +71,12 @@ const ProductDetail = () => {
                 quantity: quantity
             });
             if (response.data.success) {
-                setMessage('✓ Đã thêm vào giỏ hàng!');
+                setMessage('✓ ' + t('product.addedToCart'));
                 setTimeout(() => setMessage(''), 3000);
             }
         } catch (error) {
             console.error("Add to cart failed", error);
-            setMessage('✗ Lỗi khi thêm vào giỏ hàng');
+            setMessage('✗ ' + t('product.addToCartError'));
         } finally {
             setAdding(false);
         }
@@ -95,7 +97,7 @@ const ProductDetail = () => {
                 <Navbar />
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
-                    <p>Đang tải...</p>
+                    <p>{t('common.loading')}</p>
                 </div>
             </div>
         );
@@ -106,8 +108,8 @@ const ProductDetail = () => {
             <div className="product-detail-page">
                 <Navbar />
                 <div className="not-found">
-                    <h2>Sản phẩm không tồn tại</h2>
-                    <Link to="/" className="btn-back">← Về trang chủ</Link>
+                    <h2>{t('product.notFound')}</h2>
+                    <Link to="/" className="btn-back">← {t('product.backHome')}</Link>
                 </div>
             </div>
         );
@@ -119,7 +121,7 @@ const ProductDetail = () => {
 
             <div className="container">
                 <div className="breadcrumb">
-                    <Link to="/">Trang chủ</Link> / <span>{product.name}</span>
+                    <Link to="/">{t('product.home')}</Link> / <span>{product.name}</span>
                 </div>
 
                 <div className="product-detail-grid">
@@ -133,13 +135,13 @@ const ProductDetail = () => {
                             {parseInt(selectedVariant?.price_adjustment
                                 ? parseInt(product.price) + parseInt(selectedVariant.price_adjustment)
                                 : product.price
-                            ).toLocaleString()}đ
+                            ).toLocaleString()}{t('common.currency')}
                         </p>
 
                         {/* Size Selection */}
                         {sizes.length > 0 && (
                             <div className="variant-selector">
-                                <label>Kích thước:</label>
+                                <label>{t('product.size')}:</label>
                                 <div className="variant-options">
                                     {sizes.map(size => (
                                         <button
@@ -157,7 +159,7 @@ const ProductDetail = () => {
                         {/* Color Selection */}
                         {colors.length > 0 && (
                             <div className="variant-selector">
-                                <label>Màu sắc:</label>
+                                <label>{t('product.color')}:</label>
                                 <div className="variant-options">
                                     {colors.map(color => (
                                         <button
@@ -176,19 +178,19 @@ const ProductDetail = () => {
                         {variants.length > 0 && selectedVariant && (
                             <div className={`stock-info ${isOutOfStock ? 'out-of-stock' : ''}`}>
                                 {isOutOfStock
-                                    ? '❌ Hết hàng'
-                                    : `✓ Còn ${getVariantStock()} sản phẩm`
+                                    ? '❌ ' + t('product.outOfStock')
+                                    : `✓ ${t('product.inStock')} ${getVariantStock()} ${t('common.products')}`
                                 }
                             </div>
                         )}
 
                         <div className="product-description">
-                            <h3>Mô tả sản phẩm</h3>
-                            <p>{product.description || 'Sản phẩm chất lượng cao từ CANIFA'}</p>
+                            <h3>{t('product.description')}</h3>
+                            <p>{product.description || t('product.defaultDescription')}</p>
                         </div>
 
                         <div className="quantity-selector">
-                            <label>Số lượng:</label>
+                            <label>{t('product.quantity')}:</label>
                             <div className="quantity-controls">
                                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
                                 <input
@@ -207,7 +209,7 @@ const ProductDetail = () => {
                             className="btn-add-to-cart"
                             disabled={adding || isOutOfStock}
                         >
-                            {adding ? 'Đang thêm...' : isOutOfStock ? 'HẾT HÀNG' : 'THÊM VÀO GIỎ'}
+                            {adding ? t('product.adding') : isOutOfStock ? t('product.soldOut') : t('product.addToCart')}
                         </button>
 
                         {message && (
@@ -219,15 +221,15 @@ const ProductDetail = () => {
                         <div className="product-extra-info">
                             <div className="extra-item">
                                 <span>🚚</span>
-                                <p>Miễn phí vận chuyển cho đơn từ 500k</p>
+                                <p>{t('product.freeShipping')}</p>
                             </div>
                             <div className="extra-item">
                                 <span>↩️</span>
-                                <p>Đổi trả miễn phí trong 30 ngày</p>
+                                <p>{t('product.freeReturn')}</p>
                             </div>
                             <div className="extra-item">
                                 <span>✅</span>
-                                <p>Cam kết chính hãng 100%</p>
+                                <p>{t('product.authentic')}</p>
                             </div>
                         </div>
                     </div>

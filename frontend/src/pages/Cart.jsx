@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useTranslation } from '../hooks/useTranslation';
 import './Cart.css';
 
 const Cart = () => {
+    const { t } = useTranslation();
     const [cart, setCart] = useState({ items: [], total_price: 0, count: 0 });
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(null);
@@ -63,7 +65,7 @@ const Cart = () => {
                 <Navbar />
                 <div className="cart-loading">
                     <div className="loading-spinner"></div>
-                    <p>Đang tải giỏ hàng...</p>
+                    <p>{t('cart.loading')}</p>
                 </div>
             </div>
         );
@@ -75,17 +77,17 @@ const Cart = () => {
 
             <div className="cart-container">
                 <div className="cart-header">
-                    <h1>🛒 Giỏ hàng của bạn</h1>
-                    <span className="cart-count">{cart.count || 0} sản phẩm</span>
+                    <h1>🛒 {t('cart.title')}</h1>
+                    <span className="cart-count">{cart.count || 0} {t('common.products')}</span>
                 </div>
 
                 {cart.items.length === 0 ? (
                     <div className="cart-empty">
                         <div className="empty-icon">🛒</div>
-                        <h2>Giỏ hàng trống</h2>
-                        <p>Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!</p>
+                        <h2>{t('cart.empty')}</h2>
+                        <p>{t('cart.emptyMessage')}</p>
                         <Link to="/" className="btn-continue-shopping">
-                            Tiếp tục mua sắm
+                            {t('cart.continueShopping')}
                         </Link>
                     </div>
                 ) : (
@@ -102,7 +104,7 @@ const Cart = () => {
                                             {item.name}
                                         </Link>
                                         <p className="item-price-single">
-                                            {parseInt(item.price).toLocaleString()}đ
+                                            {parseInt(item.price).toLocaleString()}{t('common.currency')}
                                         </p>
                                     </div>
 
@@ -125,9 +127,9 @@ const Cart = () => {
                                     </div>
 
                                     <div className="item-subtotal">
-                                        <span className="subtotal-label">Thành tiền</span>
+                                        <span className="subtotal-label">{t('cart.subtotal')}</span>
                                         <span className="subtotal-value">
-                                            {parseInt(item.subtotal).toLocaleString()}đ
+                                            {parseInt(item.subtotal).toLocaleString()}{t('common.currency')}
                                         </span>
                                     </div>
 
@@ -135,7 +137,7 @@ const Cart = () => {
                                         className="item-remove"
                                         onClick={() => removeItem(item.id)}
                                         disabled={updating === item.id}
-                                        title="Xóa sản phẩm"
+                                        title={t('cart.removeItem')}
                                     >
                                         ✕
                                     </button>
@@ -144,39 +146,39 @@ const Cart = () => {
                         </div>
 
                         <div className="cart-summary">
-                            <h3>Tóm tắt đơn hàng</h3>
+                            <h3>{t('cart.orderSummary')}</h3>
 
                             <div className="summary-row">
-                                <span>Tạm tính ({cart.count} sản phẩm)</span>
-                                <span>{parseInt(cart.total_price).toLocaleString()}đ</span>
+                                <span>{t('cart.tempTotal')} ({cart.count} {t('common.products')})</span>
+                                <span>{parseInt(cart.total_price).toLocaleString()}{t('common.currency')}</span>
                             </div>
 
                             <div className="summary-row">
-                                <span>Phí vận chuyển</span>
-                                <span className="free-shipping">Miễn phí</span>
+                                <span>{t('cart.shipping')}</span>
+                                <span className="free-shipping">{t('cart.freeShipping')}</span>
                             </div>
 
                             <div className="summary-row discount">
-                                <span>Mã giảm giá</span>
-                                <input type="text" placeholder="Nhập mã" className="promo-input" />
+                                <span>{t('cart.promoCode')}</span>
+                                <input type="text" placeholder={t('cart.promoPlaceholder')} className="promo-input" />
                             </div>
 
                             <div className="summary-divider"></div>
 
                             <div className="summary-total">
-                                <span>Tổng cộng</span>
+                                <span>{t('cart.total')}</span>
                                 <span className="total-price">
-                                    {parseInt(cart.total_price).toLocaleString()}đ
+                                    {parseInt(cart.total_price).toLocaleString()}{t('common.currency')}
                                 </span>
                             </div>
 
                             <Link to="/checkout" className="btn-checkout">
-                                Tiến hành thanh toán
+                                {t('cart.checkout')}
                                 <span className="btn-arrow">→</span>
                             </Link>
 
                             <Link to="/" className="btn-back-shopping">
-                                ← Tiếp tục mua sắm
+                                ← {t('cart.backShopping')}
                             </Link>
                         </div>
                     </div>
