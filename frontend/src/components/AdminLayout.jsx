@@ -19,11 +19,15 @@ const AdminLayout = () => {
                     <p>Xin chào, {user?.username}</p>
                 </div>
                 <nav className="admin-nav">
-                    <Link to="/admin">Dashboard</Link>
-                    <Link to="/admin/products">Sản phẩm</Link>
-                    <Link to="/admin/orders">Đơn hàng</Link>
-                    <Link to="/">Về trang chủ</Link>
-                    <button onClick={handleLogout} className="logout-btn">Đăng xuất</button>
+                    <Link to="/admin">📊 Dashboard</Link>
+                    <Link to="/admin/products">📦 Sản phẩm</Link>
+                    <Link to="/admin/inventory">🏪 Tồn kho</Link>
+                    <Link to="/admin/orders">🛒 Đơn hàng</Link>
+                    <Link to="/admin/users">👥 Người dùng</Link>
+                    <Link to="/admin/promotions">🎁 Khuyến mãi</Link>
+                    <hr style={{ margin: '10px 0', border: 'none', borderTop: '1px solid #444' }} />
+                    <Link to="/">🏠 Về trang chủ</Link>
+                    <button onClick={handleLogout} className="logout-btn">🚪 Đăng xuất</button>
                 </nav>
             </aside>
             <main className="admin-content">

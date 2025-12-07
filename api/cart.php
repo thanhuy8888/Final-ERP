@@ -1,4 +1,11 @@
+<?php
 require_once '../includes/api_header.php';
+require_once '../includes/db.php';
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Handle POST actions (Add/Update/Remove)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

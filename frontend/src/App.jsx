@@ -7,11 +7,16 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import Orders from './pages/Orders';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminOrders from './pages/admin/Orders';
 import ProductForm from './pages/admin/ProductForm';
 import OrderDetail from './pages/admin/OrderDetail';
+import AdminUsers from './pages/admin/Users';
+import AdminInventory from './pages/admin/Inventory';
+import AdminPromotions from './pages/admin/Promotions';
 import './App.css';
 
 function App() {
@@ -24,6 +29,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orders" element={<Orders />} />
+
 
         {/* Admin Routes */}
         <Route path="/admin" element={
@@ -37,6 +45,9 @@ function App() {
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="orders/:id" element={<OrderDetail />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="inventory" element={<AdminInventory />} />
+          <Route path="promotions" element={<AdminPromotions />} />
         </Route>
       </Routes>
     </AuthProvider>

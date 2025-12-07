@@ -34,6 +34,10 @@ const OrderDetail = () => {
         }
     };
 
+    const openInvoice = () => {
+        window.open(`http://localhost/Final-ERP/api/invoice.php?order_id=${id}`, '_blank');
+    };
+
     if (loading) return <div>Loading...</div>;
     if (!order) return <div>Không tìm thấy đơn hàng</div>;
 
@@ -41,7 +45,12 @@ const OrderDetail = () => {
         <div>
             <div className="admin-header">
                 <h1>Chi tiết đơn hàng #{id}</h1>
-                <button onClick={() => navigate('/admin/orders')} className="btn-primary">← Quay lại</button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={openInvoice} className="btn-primary" style={{ background: '#2ecc71' }}>
+                        🧾 Xuất hóa đơn
+                    </button>
+                    <button onClick={() => navigate('/admin/orders')} className="btn-primary">← Quay lại</button>
+                </div>
             </div>
 
             <div className="admin-card">
