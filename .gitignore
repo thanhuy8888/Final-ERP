@@ -24,7 +24,8 @@ Thumbs.db
 # frontend/node_modules/
 
 # Cache
-cache/
+# Cache
+# cache/
 
 # Test/utility scripts (NOT in api folder)
 test_*.php
