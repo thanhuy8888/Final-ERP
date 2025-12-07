@@ -18,3 +18,17 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.log
+
+# Dependencies
+vendor/
+frontend/node_modules/
+
+# Cache
+cache/
+
+# Test/utility scripts
+test_*.php
+check_*.php
+fix_*.php
+insert_sample_products.php
+run_sales_migration.php

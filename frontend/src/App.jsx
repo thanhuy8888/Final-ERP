@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
+import SaleLayout from './components/SaleLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -17,6 +18,11 @@ import OrderDetail from './pages/admin/OrderDetail';
 import AdminUsers from './pages/admin/Users';
 import AdminInventory from './pages/admin/Inventory';
 import AdminPromotions from './pages/admin/Promotions';
+import AdminReports from './pages/admin/Reports';
+import SaleDashboard from './pages/sale/Dashboard';
+import SaleOrders from './pages/sale/Orders';
+import SaleCustomers from './pages/sale/Customers';
+import SaleNewOrder from './pages/sale/NewOrder';
 import './App.css';
 
 function App() {
@@ -32,6 +38,17 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orders" element={<Orders />} />
 
+        {/* Sale Routes */}
+        <Route path="/sale" element={
+          <ProtectedRoute saleOnly>
+            <SaleLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<SaleDashboard />} />
+          <Route path="orders" element={<SaleOrders />} />
+          <Route path="customers" element={<SaleCustomers />} />
+          <Route path="new-order" element={<SaleNewOrder />} />
+        </Route>
 
         {/* Admin Routes */}
         <Route path="/admin" element={
@@ -48,6 +65,7 @@ function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="inventory" element={<AdminInventory />} />
           <Route path="promotions" element={<AdminPromotions />} />
+          <Route path="reports" element={<AdminReports />} />
         </Route>
       </Routes>
     </AuthProvider>
@@ -55,3 +73,4 @@ function App() {
 }
 
 export default App;
+

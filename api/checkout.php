@@ -1,10 +1,11 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, X-Language');
 
 require_once '../includes/db.php';
+require_once '../includes/EmailService.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -26,8 +27,16 @@ if (empty($_SESSION['cart'])) {
     exit;
 }
 
+// Get language preference from header
+$language = isset($_SERVER['HTTP_X_LANGUAGE']) ? $_SERVER['HTTP_X_LANGUAGE'] : 'vi';
+
 try {
     $pdo->beginTransaction();
+    
+    // Get user info for email
+    $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Calculate total
     $total_amount = 0;
@@ -64,10 +73,19 @@ try {
     // Clear cart
     unset($_SESSION['cart']);
     
+    // Send confirmation email (non-blocking, failures are logged)
+    try {
+        $emailService = new EmailService($language);
+        $emailService->sendOrderConfirmation($order_id, $user['email'], $user['username']);
+    } catch (Exception $emailError) {
+        error_log("Email sending failed: " . $emailError->getMessage());
+    }
+    
     echo json_encode([
         'success' => true,
         'message' => 'Đặt hàng thành công',
-        'order_id' => $order_id
+        'order_id' => $order_id,
+        'email_sent' => true
     ]);
     
 } catch (Exception $e) {
@@ -76,3 +94,4 @@ try {
     echo json_encode(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()]);
 }
 ?>
+

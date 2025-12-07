@@ -1,0 +1,121 @@
+.sale-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.sale-sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.sale-brand {
+    padding: 24px 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sale-brand h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.sale-brand p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.sale-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+    gap: 4px;
+}
+
+.sale-nav a {
+    display: block;
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.sale-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.sale-nav a.active {
+    background: rgba(52, 152, 219, 0.3);
+    color: white;
+}
+
+.lang-toggle-sale {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.lang-toggle-sale:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.logout-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(231, 76, 60, 0.2);
+    border: none;
+    color: #e74c3c;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-top: auto;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background: rgba(231, 76, 60, 0.3);
+}
+
+.sale-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sale-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .sale-content {
+        margin-left: 0;
+    }
+}

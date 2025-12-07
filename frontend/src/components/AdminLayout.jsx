@@ -27,6 +27,7 @@ const AdminLayout = () => {
                     <Link to="/admin/orders">🛒 {t('admin.orders')}</Link>
                     <Link to="/admin/users">👥 {t('admin.users')}</Link>
                     <Link to="/admin/promotions">🎁 {t('admin.promotions')}</Link>
+                    <Link to="/admin/reports">📈 {t('admin.reports')}</Link>
                     <hr style={{ margin: '10px 0', border: 'none', borderTop: '1px solid #444' }} />
                     <button
                         className="lang-toggle-admin"

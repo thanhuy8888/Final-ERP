@@ -1,6 +1,7 @@
 <?php
 require_once '../../includes/api_header.php';
 require_once '../../includes/db.php';
+require_once '../../includes/file_cache.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -12,6 +13,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
+
+// Try cache first (2 minute TTL for dashboard stats)
+$cacheKey = 'admin_stats';
+$cachedResult = $cache->get($cacheKey);
+if ($cachedResult !== null) {
+    header('X-Cache: HIT');
+    echo json_encode($cachedResult);
+    exit;
+}
+
+header('X-Cache: MISS');
 
 try {
     // Basic stats
@@ -78,7 +90,7 @@ try {
     ");
     $monthly_revenue = $stmt->fetchAll();
 
-    echo json_encode([
+    $result = [
         'product_count' => $product_count,
         'order_count' => $order_count,
         'customer_count' => $customer_count,
@@ -88,7 +100,12 @@ try {
         'top_products' => $top_products,
         'recent_orders' => $recent_orders,
         'monthly_revenue' => $monthly_revenue
-    ]);
+    ];
+    
+    // Store in cache for 2 minutes (120 seconds)
+    $cache->set($cacheKey, $result, 120);
+    
+    echo json_encode($result);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
