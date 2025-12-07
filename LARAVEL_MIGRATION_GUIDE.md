@@ -143,5 +143,3 @@ const api = axios.create({
 3. **Test từng phần**: Chuyển từng API endpoint sang Laravel và test kỹ trước khi tiếp tục
 
 ---
-
-*Hướng dẫn tạo bởi Gemini - December 6, 2025*
