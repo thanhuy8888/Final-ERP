@@ -1,4 +1,4 @@
-# Canifa Clone - E-commerce Website
+# Canifa Corner - E-commerce Website
 
 Website thương mại điện tử theo mẫu Canifa, xây dựng bằng PHP với 2 khu vực riêng biệt:
 - **Portal Khách hàng**: Duyệt sản phẩm, giỏ hàng, thanh toán
