@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost/Final-ERP/api', // Adjust if your local path differs
+    baseURL: 'http://localhost/Final%20ERP/api', // Fixed path to match filesystem
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
