@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check admin auth
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403);
     echo json_encode(['error' => 'Unauthorized']);
@@ -15,69 +14,77 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (isset($_GET['product_id'])) {
-            // Get variants for a specific product
-            $stmt = $pdo->prepare("SELECT * FROM product_variants WHERE product_id = ? ORDER BY size, color");
-            $stmt->execute([$_GET['product_id']]);
-            $variants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($variants);
-        } else {
-            // Get all variants with product info
-            $stmt = $pdo->query("
-                SELECT pv.*, p.name as product_name, p.price as base_price 
-                FROM product_variants pv 
-                JOIN products p ON pv.product_id = p.id 
-                ORDER BY p.name, pv.size, pv.color
-            ");
-            $variants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($variants);
-        }
-        
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // List all variants with product info
+        $query = "
+            SELECT v.*, p.name as product_name, p.image as product_image 
+            FROM product_variants v
+            JOIN products p ON v.product_id = p.id
+            ORDER BY v.created_at DESC
+        ";
+        $stmt = $pdo->query($query);
+        $variants = $stmt->fetchAll();
+        echo json_encode($variants);
+    } 
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = json_decode(file_get_contents("php://input"), true);
+        $action = $data['action'] ?? '';
+
         
-        if (isset($data['variant_id']) && $data['variant_id']) {
-            // Update existing variant
-            $stmt = $pdo->prepare("
-                UPDATE product_variants 
-                SET size = ?, color = ?, color_code = ?, price_adjustment = ?, is_active = ?
-                WHERE variant_id = ?
-            ");
-            $stmt->execute([
-                $data['size'],
-                $data['color'],
-                $data['color_code'] ?? null,
-                $data['price_adjustment'] ?? 0,
-                $data['is_active'] ?? true,
-                $data['variant_id']
-            ]);
-            echo json_encode(['success' => true, 'message' => 'Cập nhật biến thể thành công']);
-        } else {
-            // Create new variant
-            $variant_sku = $data['variant_sku'] ?? ('VAR-' . time() . '-' . rand(1000, 9999));
-            $stmt = $pdo->prepare("
-                INSERT INTO product_variants (product_id, size, color, color_code, variant_sku, price_adjustment, is_active) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $data['product_id'],
-                $data['size'],
-                $data['color'],
-                $data['color_code'] ?? null,
-                $variant_sku,
-                $data['price_adjustment'] ?? 0,
-                $data['is_active'] ?? true
-            ]);
-            echo json_encode(['success' => true, 'message' => 'Thêm biến thể thành công', 'variant_id' => $pdo->lastInsertId()]);
+        switch ($action) {
+            case 'create':
+                $stmt = $pdo->prepare("INSERT INTO product_variants (product_id, sku, barcode, size, color, quantity, price_adjustment, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $data['product_id'],
+                    $data['sku'],
+                    $data['barcode'] ?? null,
+                    $data['size'],
+                    $data['color'],
+                    $data['quantity'] ?? 0,
+                    $data['price_adjustment'] ?? 0,
+                    'active'
+                ]);
+                echo json_encode(['success' => true, 'message' => 'Added variant successfully', 'id' => $pdo->lastInsertId()]);
+                break;
+
+            case 'update':
+                $stmt = $pdo->prepare("UPDATE product_variants SET sku = ?, barcode = ?, size = ?, color = ?, price_adjustment = ? WHERE variant_id = ?");
+                $stmt->execute([
+                    $data['sku'],
+                    $data['barcode'],
+                    $data['size'],
+                    $data['color'],
+                    $data['price_adjustment'],
+                    $data['id']
+                ]);
+                echo json_encode(['success' => true, 'message' => 'Updated variant successfully']);
+                break;
+
+            case 'toggle_status':
+                $stmt = $pdo->prepare("UPDATE product_variants SET status = ? WHERE variant_id = ?");
+                $stmt->execute([$data['status'], $data['id']]);
+                echo json_encode(['success' => true, 'message' => 'Status updated']);
+                break;
+
+            case 'delete':
+                try {
+                    $stmt = $pdo->prepare("DELETE FROM product_variants WHERE variant_id = ?");
+                    $stmt->execute([$data['id']]);
+                    echo json_encode(['success' => true, 'message' => 'Variant deleted']);
+                } catch (PDOException $e) {
+                    if ($e->getCode() == '23000') {
+                        http_response_code(400);
+                        echo json_encode(['error' => 'Cannot delete variant: It is associated with existing orders or inventory.']);
+                    } else {
+                        throw $e;
+                    }
+                }
+                break;
+
+            default:
+                throw new Exception("Invalid action");
         }
-        
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        $data = json_decode(file_get_contents("php://input"), true);
-        $stmt = $pdo->prepare("DELETE FROM product_variants WHERE variant_id = ?");
-        $stmt->execute([$data['variant_id']]);
-        echo json_encode(['success' => true, 'message' => 'Xóa biến thể thành công']);
     }
-} catch (PDOException $e) {
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }

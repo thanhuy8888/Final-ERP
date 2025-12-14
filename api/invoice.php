@@ -25,13 +25,19 @@ if (!$order_id) {
 
 try {
     // Get order details
-    $sql = "SELECT o.*, u.name as customer_name, u.email as customer_email, u.phone as customer_phone
+    $sql = "SELECT o.*, 
+            COALESCE(c.full_name, 
+                CASE WHEN u.username = 'customer_test' THEN 'Walk-in Customer' ELSE u.username END
+            ) as customer_name,
+            COALESCE(c.email, u.email) as customer_email, 
+            COALESCE(c.phone, u.phone) as customer_phone
             FROM orders o
             LEFT JOIN users u ON o.user_id = u.id
+            LEFT JOIN customers c ON o.customer_id = c.id
             WHERE o.id = ?";
     
-    // If not admin, only allow viewing own orders
-    if ($role !== 'admin') {
+    // If not admin or sale, only allow viewing own orders
+    if ($role !== 'admin' && $role !== 'sale') {
         $sql .= " AND o.user_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$order_id, $user_id]);
@@ -50,7 +56,7 @@ try {
 
     // Get order items
     $stmt = $pdo->prepare("
-        SELECT oi.*, p.name as product_name, p.image_url
+        SELECT oi.*, p.name as product_name, p.image
         FROM order_items oi
         JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = ?

@@ -6,111 +6,111 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check admin auth
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    http_response_code(403);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'GET') {
+    try {
+        $sql = "SELECT * FROM promotions ORDER BY created_at DESC";
+        $stmt = $pdo->query($sql);
+        $promotions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Decode JSON fields
+        foreach ($promotions as &$p) {
+            $p['scope_ids'] = json_decode($p['scope_ids'] ?? '[]', true);
+            $p['membership_tiers'] = json_decode($p['membership_tiers'] ?? '[]', true);
+        }
+        
+        echo json_encode($promotions);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
 }
 
-try {
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (isset($_GET['id'])) {
-            // Get specific promotion with linked products
-            $stmt = $pdo->prepare("SELECT * FROM promotions WHERE promotion_id = ?");
-            $stmt->execute([$_GET['id']]);
-            $promotion = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($method === 'POST') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    
+    // Validation
+    if (empty($data['promotion_code']) || empty($data['promotion_name'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing required fields']);
+        exit;
+    }
+    
+    // Format JSON fields
+    $scope_ids = isset($data['scope_ids']) ? json_encode($data['scope_ids']) : NULL;
+    $membership_tiers = isset($data['membership_tiers']) ? json_encode($data['membership_tiers']) : NULL;
+    
+    // Status Logic
+    $status = $data['status'] ?? 'draft'; 
+
+    try {
+        if (isset($data['promotion_id'])) {
+            // Update
+            $sql = "UPDATE promotions SET 
+                    promotion_code = ?, promotion_name = ?, description = ?, 
+                    discount_type = ?, discount_value = ?, buy_x = ?, get_y = ?,
+                    min_purchase_amount = ?, max_discount_amount = ?, 
+                    start_date = ?, end_date = ?, 
+                    status = ?, is_active = ?,
+                    scope_type = ?, scope_ids = ?, membership_tiers = ?,
+                    usage_limit = ?, priority = ?, stackable = ?
+                    WHERE promotion_id = ?";
             
-            if ($promotion) {
-                // Get linked products
-                $stmt = $pdo->prepare("
-                    SELECT pp.*, p.name as product_name, c.name as category_name
-                    FROM promotion_products pp
-                    LEFT JOIN products p ON pp.product_id = p.id
-                    LEFT JOIN categories c ON pp.category_id = c.id
-                    WHERE pp.promotion_id = ?
-                ");
-                $stmt->execute([$_GET['id']]);
-                $promotion['products'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
-            
-            echo json_encode($promotion);
-        } elseif (isset($_GET['active'])) {
-            // Get active promotions only
-            $stmt = $pdo->query("
-                SELECT * FROM promotions 
-                WHERE is_active = TRUE AND start_date <= NOW() AND end_date >= NOW()
-                ORDER BY end_date ASC
-            ");
-            $promotions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($promotions);
-        } else {
-            // Get all promotions
-            $stmt = $pdo->query("SELECT * FROM promotions ORDER BY created_at DESC");
-            $promotions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($promotions);
-        }
-        
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (isset($data['promotion_id']) && $data['promotion_id']) {
-            // Update existing promotion
-            $stmt = $pdo->prepare("
-                UPDATE promotions 
-                SET promotion_code = ?, promotion_name = ?, description = ?, 
-                    discount_type = ?, discount_value = ?, min_purchase_amount = ?,
-                    max_discount_amount = ?, start_date = ?, end_date = ?, 
-                    usage_limit = ?, is_active = ?
-                WHERE promotion_id = ?
-            ");
+            $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                $data['promotion_code'],
-                $data['promotion_name'],
-                $data['description'] ?? null,
-                $data['discount_type'],
-                $data['discount_value'],
-                $data['min_purchase_amount'] ?? 0,
-                $data['max_discount_amount'] ?? null,
-                $data['start_date'],
-                $data['end_date'],
-                $data['usage_limit'] ?? null,
-                $data['is_active'] ?? true,
+                $data['promotion_code'], $data['promotion_name'], $data['description'] ?? '',
+                $data['discount_type'], $data['discount_value'] ?? 0, $data['buy_x'] ?? NULL, $data['get_y'] ?? NULL,
+                $data['min_purchase_amount'] ?? 0, $data['max_discount_amount'] ?? NULL,
+                $data['start_date'], $data['end_date'],
+                $status, $data['is_active'] ?? 1,
+                $data['scope_type'] ?? 'all', $scope_ids, $membership_tiers,
+                $data['usage_limit'] ?? NULL, $data['priority'] ?? 0, $data['stackable'] ?? 0,
                 $data['promotion_id']
             ]);
-            echo json_encode(['success' => true, 'message' => 'Cập nhật khuyến mãi thành công']);
+            
+            echo json_encode(['success' => true, 'message' => 'Promotion updated']);
         } else {
-            // Create new promotion
-            $stmt = $pdo->prepare("
-                INSERT INTO promotions (promotion_code, promotion_name, description, discount_type, 
-                    discount_value, min_purchase_amount, max_discount_amount, start_date, end_date, 
-                    usage_limit, is_active) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
+            // Create
+            $sql = "INSERT INTO promotions (
+                    promotion_code, promotion_name, description, 
+                    discount_type, discount_value, buy_x, get_y,
+                    min_purchase_amount, max_discount_amount, 
+                    start_date, end_date, 
+                    status, is_active,
+                    scope_type, scope_ids, membership_tiers,
+                    usage_limit, priority, stackable
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                
+            $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                $data['promotion_code'],
-                $data['promotion_name'],
-                $data['description'] ?? null,
-                $data['discount_type'],
-                $data['discount_value'],
-                $data['min_purchase_amount'] ?? 0,
-                $data['max_discount_amount'] ?? null,
-                $data['start_date'],
-                $data['end_date'],
-                $data['usage_limit'] ?? null,
-                $data['is_active'] ?? true
+                $data['promotion_code'], $data['promotion_name'], $data['description'] ?? '',
+                $data['discount_type'], $data['discount_value'] ?? 0, $data['buy_x'] ?? NULL, $data['get_y'] ?? NULL,
+                $data['min_purchase_amount'] ?? 0, $data['max_discount_amount'] ?? NULL,
+                $data['start_date'], $data['end_date'],
+                $status, $data['is_active'] ?? 1,
+                $data['scope_type'] ?? 'all', $scope_ids, $membership_tiers,
+                $data['usage_limit'] ?? NULL, $data['priority'] ?? 0, $data['stackable'] ?? 0
             ]);
-            echo json_encode(['success' => true, 'message' => 'Thêm khuyến mãi thành công', 'promotion_id' => $pdo->lastInsertId()]);
+            
+            echo json_encode(['success' => true, 'message' => 'Promotion created']);
         }
-        
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        $data = json_decode(file_get_contents("php://input"), true);
-        $stmt = $pdo->prepare("DELETE FROM promotions WHERE promotion_id = ?");
-        $stmt->execute([$data['promotion_id']]);
-        echo json_encode(['success' => true, 'message' => 'Xóa khuyến mãi thành công']);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
     }
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+}
+
+if ($method === 'DELETE') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!isset($data['promotion_id'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing ID']);
+        exit;
+    }
+    
+    $stmt = $pdo->prepare("DELETE FROM promotions WHERE promotion_id = ?");
+    $stmt->execute([$data['promotion_id']]);
+    echo json_encode(['success' => true]);
 }
 ?>

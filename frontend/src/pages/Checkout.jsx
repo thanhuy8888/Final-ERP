@@ -214,12 +214,12 @@ const Checkout = () => {
                                     </div>
                                 </label>
 
-                                <label className={`payment-option ${formData.payment_method === 'bank' ? 'selected' : ''}`}>
+                                <label className={`payment-option ${formData.payment_method === 'transfer' ? 'selected' : ''}`}>
                                     <input
                                         type="radio"
                                         name="payment"
-                                        value="bank"
-                                        checked={formData.payment_method === 'bank'}
+                                        value="transfer"
+                                        checked={formData.payment_method === 'transfer'}
                                         onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
                                     />
                                     <span className="payment-icon">🏦</span>

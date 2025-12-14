@@ -38,11 +38,11 @@ const AdminProducts = () => {
     };
 
     const handleExport = () => {
-        window.open('http://localhost/Final-ERP/api/admin/products-import-export.php?action=export', '_blank');
+        window.open('http://localhost:8081/Final-ERP/api/admin/products-import-export.php?action=export', '_blank');
     };
 
     const handleDownloadTemplate = () => {
-        window.open('http://localhost/Final-ERP/api/admin/products-import-export.php?action=template', '_blank');
+        window.open('http://localhost:8081/Final-ERP/api/admin/products-import-export.php?action=template', '_blank');
     };
 
     const handleImportClick = () => {

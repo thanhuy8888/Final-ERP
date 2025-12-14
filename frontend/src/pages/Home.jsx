@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import api from '../api/axios';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { useTranslation } from '../hooks/useTranslation';
 import './Home.css';
 
@@ -213,21 +214,7 @@ const Home = () => {
                 </div>
             </section>
 
-            <footer className="footer">
-                <div className="container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <h3>CANIFA</h3>
-                            <p>{t('home.footerSlogan')}</p>
-                        </div>
-                        <div className="footer-links">
-                            <Link to="/orders">{t('home.myOrders')}</Link>
-                            <Link to="/cart">{t('navbar.cart')}</Link>
-                        </div>
-                    </div>
-                    <p className="copyright">&copy; 2024 CANIFA. All rights reserved.</p>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

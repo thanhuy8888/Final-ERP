@@ -28,7 +28,8 @@ try {
             $stmt = $pdo->prepare("
                 SELECT c.*, 
                     (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) as order_count,
-                    (SELECT SUM(total_amount) FROM orders WHERE customer_id = c.id) as total_spent
+                    (SELECT SUM(total_amount) FROM orders WHERE customer_id = c.id) as total_spent,
+                    (SELECT COUNT(*) FROM sale_returns r JOIN orders o ON r.order_id = o.id WHERE o.customer_id = c.id) as return_count
                 FROM customers c 
                 WHERE c.id = ?
             ");
@@ -36,16 +37,73 @@ try {
             $customer = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($customer) {
-                // Get recent orders
+                // Get recent orders with item count
                 $stmt = $pdo->prepare("
-                    SELECT id, total_amount, status, created_at 
-                    FROM orders 
-                    WHERE customer_id = ? 
-                    ORDER BY created_at DESC 
+                    SELECT o.id, o.total_amount, o.status, o.created_at,
+                        (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) as item_count
+                    FROM orders o
+                    WHERE o.customer_id = ? 
+                    ORDER BY o.created_at DESC 
                     LIMIT 5
                 ");
                 $stmt->execute([$_GET['id']]);
                 $customer['recent_orders'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Logic for Tags & Recommendations (Demo Rule-based)
+                $tags = [];
+                if ($customer['return_count'] > 0) $tags[] = 'high_return';
+                if ($customer['total_spent'] > 5000000) $tags[] = 'vip';
+                if ($customer['total_spent'] > 500000 && $customer['return_count'] == 0) $tags[] = 'potential_upsell';
+                if ($customer['order_count'] <= 2) $tags[] = 'new';
+                
+                $customer['tags'] = $tags;
+
+                // Simple AI Recommendation Mock
+                $recommendations = [
+                    'potential_upsell' => 'Gợi ý: Khách có tiềm năng mua thêm Phụ kiện (Thắt lưng, Ví).',
+                    'high_return' => 'Cảnh báo: Khách hay hoàn hàng. Tư vấn kỹ về Size.',
+                    'vip' => 'Gợi ý: Giới thiệu Bộ sưu tập mới nhất (Ưu tiên VIP).',
+                    'new' => 'Gợi ý: Xin Feedback đơn đầu tiên & Tặng mã giảm giá 5%.'
+                ];
+
+                // Pick recommendation based on priority tag
+                $rec = 'Gợi ý: Mời khách tham gia chương trình thành viên.';
+                if (in_array('high_return', $tags)) $rec = $recommendations['high_return'];
+                else if (in_array('vip', $tags)) $rec = $recommendations['vip'];
+                else if (in_array('potential_upsell', $tags)) $rec = $recommendations['potential_upsell'];
+                else if (in_array('new', $tags)) $rec = $recommendations['new'];
+
+                $customer['recommendation'] = $rec;
+                
+                // ===== LOYALTY DATA =====
+                $tier = $customer['membership_tier'] ?? 'bronze';
+                // Handle empty string from database
+                if (empty($tier)) {
+                    $tier = 'bronze';
+                }
+                $points = intval($customer['loyalty_points'] ?? 0);
+                $lifetimeSpent = floatval($customer['total_lifetime_spent'] ?? 0);
+                
+                // Tier benefits
+                $tierBenefits = [
+                    'bronze' => ['discount' => 0, 'multiplier' => 1.0, 'next_tier' => 'silver', 'next_threshold' => 5000000],
+                    'silver' => ['discount' => 5, 'multiplier' => 1.2, 'next_tier' => 'gold', 'next_threshold' => 20000000],
+                    'gold' => ['discount' => 10, 'multiplier' => 1.5, 'next_tier' => 'platinum', 'next_threshold' => 50000000],
+                    'platinum' => ['discount' => 15, 'multiplier' => 2.0, 'next_tier' => null, 'next_threshold' => null]
+                ];
+                
+                $customer['loyalty'] = [
+                    'points' => $points,
+                    'points_value' => floor($points / 100) * 10000, // 100 points = 10,000 VND
+                    'tier' => $tier,
+                    'tier_discount' => $tierBenefits[$tier]['discount'],
+                    'tier_multiplier' => $tierBenefits[$tier]['multiplier'],
+                    'lifetime_spent' => $lifetimeSpent,
+                    'next_tier' => $tierBenefits[$tier]['next_tier'],
+                    'next_threshold' => $tierBenefits[$tier]['next_threshold'],
+                    'progress_to_next' => $tierBenefits[$tier]['next_threshold'] ? 
+                        min(100, ($lifetimeSpent / $tierBenefits[$tier]['next_threshold']) * 100) : 100
+                ];
             }
             
             echo json_encode($customer ?: ['error' => 'Customer not found']);
@@ -119,8 +177,8 @@ try {
         }
         
         $stmt = $pdo->prepare("
-            INSERT INTO customers (phone, full_name, email, address, city, notes, created_by) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO customers (phone, full_name, email, address, city, created_by) 
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['phone'],
@@ -128,7 +186,6 @@ try {
             $data['email'] ?? null,
             $data['address'] ?? null,
             $data['city'] ?? null,
-            $data['notes'] ?? null,
             $saleId
         ]);
         
@@ -154,7 +211,7 @@ try {
         $updates = [];
         $params = [];
         
-        $fields = ['full_name', 'email', 'address', 'city', 'notes'];
+        $fields = ['full_name', 'email', 'address', 'city'];
         foreach ($fields as $field) {
             if (isset($data[$field])) {
                 $updates[] = "$field = ?";

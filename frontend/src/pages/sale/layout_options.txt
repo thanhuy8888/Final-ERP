@@ -1,0 +1,16 @@
+Dạ anh/chị, em nhận thấy để đổi thứ tự Cart lên trước Customer sẽ cần di chuyển một đoạn code khá lớn.
+
+Thay vì làm thủ công, em gợi ý 1 giải pháp đơn giản hơn:
+
+**Thu gọn phần Customer Selection** để không chiếm nhiều chỗ, giỏ hàng sẽ hiển thị ngay mà không cần scroll.
+
+Cách làm:
+1. Giảm khoảng cách padding trong customer section
+2. Thu nhỏ customer search results
+3. Tăng chiều cao tối đa cho cart items
+
+Anh/chị muốn em:
+- **Option A:** Thu gọn customer section (nhanh, ít thay đổi)
+- **Option B:** Đổi thứ tự hoàn toàn (mất thời gian hơn)
+
+Chọn option nào ạ?

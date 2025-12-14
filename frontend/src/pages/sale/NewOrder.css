@@ -10,7 +10,8 @@
 
 .order-grid {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 350px;
+    /* Reduced from 400px to 350px */
     gap: 24px;
 }
 
@@ -60,6 +61,26 @@
     flex-direction: column;
 }
 
+.stock-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.stock-badge.low {
+    background: #e74c3c;
+}
+
+.stock-badge.out {
+    background: #999;
+}
+
 .product-card .name {
     font-size: 13px;
     color: #2c3e50;
@@ -76,10 +97,45 @@
 }
 
 /* Cart Section */
+/* Cart Section */
 .cart-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 170px);
+    z-index: 99;
+}
+
+.cart-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-right: 4px;
+    /* Space for scrollbar */
+    padding-bottom: 10px;
+}
+
+/* Custom Scrollbar for cart area */
+.cart-scroll-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-scroll-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.cart-scroll-area::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.cart-scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
 }
 
 .customer-selection,
@@ -87,15 +143,19 @@
 .order-extras,
 .order-summary {
     background: white;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    /* Reduced from 16px */
+    border-radius: 10px;
+    /* Reduced from 12px */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .customer-selection h3,
 .cart-items h3 {
-    margin: 0 0 12px;
-    font-size: 15px;
+    margin: 0 0 10px;
+    /* Reduced from 12px */
+    font-size: 14px;
+    /* Reduced from 15px */
     color: #2c3e50;
 }
 
@@ -270,8 +330,8 @@
 .summary-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    font-size: 14px;
+    padding: 6px 0;
+    font-size: 13px;
 }
 
 .summary-row.discount span:last-child {
@@ -318,4 +378,36 @@
     .order-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.btn-save-draft {
+    padding: 8px 16px;
+    background: white;
+    color: #2c3e50;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-save-draft:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.btn-save-draft:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.summary-row.profit {
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding-top: 0;
+    border: none;
 }

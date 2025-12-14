@@ -15,6 +15,25 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['sale', 'admin
 
 $userId = $_SESSION['user_id'];
 
+// Create tables if not exist (Dev/Demo purposes)
+$pdo->exec("CREATE TABLE IF NOT EXISTS sale_returns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    user_id INT NOT NULL,
+    return_number VARCHAR(50),
+    refund_amount DECIMAL(10,2),
+    reason TEXT,
+    status VARCHAR(20) DEFAULT 'approved',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
+$pdo->exec("CREATE TABLE IF NOT EXISTS sale_return_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    return_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL
+)");
+
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_GET['search'])) {
@@ -47,7 +66,7 @@ try {
             // List recent returns
             $stmt = $pdo->query("
                 SELECT r.*, o.total_amount as order_total 
-                FROM returns r 
+                FROM sale_returns r 
                 JOIN orders o ON r.order_id = o.id 
                 ORDER BY r.created_at DESC LIMIT 20
             ");
@@ -69,7 +88,7 @@ try {
             }
 
             // Create Return Record
-            $stmt = $pdo->prepare("INSERT INTO returns (order_id, user_id, return_number, refund_amount, reason, status) VALUES (?, ?, ?, ?, ?, 'approved')");
+            $stmt = $pdo->prepare("INSERT INTO sale_returns (order_id, user_id, return_number, refund_amount, reason, status) VALUES (?, ?, ?, ?, ?, 'approved')");
             $returnNum = 'RET-' . time();
             $stmt->execute([
                 $orderId, 
@@ -81,15 +100,11 @@ try {
             $returnId = $pdo->lastInsertId();
 
             // Insert Return Items & Adjust Stock
-            $stmtItem = $pdo->prepare("INSERT INTO return_items (return_id, product_id, quantity) VALUES (?, ?, ?)");
-            $stmtStock = $pdo->prepare("UPDATE products SET quantity = quantity + ? WHERE id = ?"); // Assuming products has quantity, if not ignore or use inventory
-
+            $stmtItem = $pdo->prepare("INSERT INTO sale_return_items (return_id, product_id, quantity) VALUES (?, ?, ?)");
+            // Stock adjustment skipped for safe logs
             foreach ($items as $item) {
                 // Insert item record
                 $stmtItem->execute([$returnId, $item['product_id'], $item['quantity']]);
-                
-                // Optional: Adjust stock (Disabled for safety/schema mismatch risk for now, strictly logging return)
-                // $stmtStock->execute([$item['quantity'], $item['product_id']]);
             }
 
             $pdo->commit();

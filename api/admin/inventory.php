@@ -15,107 +15,106 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (isset($_GET['product_id'])) {
-            // Get inventory for specific product
-            $stmt = $pdo->prepare("
-                SELECT i.*, p.name as product_name, pv.size, pv.color, s.store_name
-                FROM inventory i
-                JOIN products p ON i.product_id = p.id
-                LEFT JOIN product_variants pv ON i.variant_id = pv.variant_id
-                JOIN stores s ON i.store_id = s.store_id
-                WHERE i.product_id = ?
-                ORDER BY pv.size, pv.color
-            ");
-            $stmt->execute([$_GET['product_id']]);
-        } elseif (isset($_GET['low_stock'])) {
-            // Get low stock alerts
-            $stmt = $pdo->query("
-                SELECT i.*, p.name as product_name, pv.size, pv.color, s.store_name
-                FROM inventory i
-                JOIN products p ON i.product_id = p.id
-                LEFT JOIN product_variants pv ON i.variant_id = pv.variant_id
-                JOIN stores s ON i.store_id = s.store_id
-                WHERE i.quantity_on_hand <= i.low_stock_threshold
-                ORDER BY i.quantity_on_hand ASC
-            ");
-        } else {
-            // Get all inventory
-            $stmt = $pdo->query("
-                SELECT i.*, p.name as product_name, pv.size, pv.color, s.store_name
-                FROM inventory i
-                JOIN products p ON i.product_id = p.id
-                LEFT JOIN product_variants pv ON i.variant_id = pv.variant_id
-                JOIN stores s ON i.store_id = s.store_id
-                ORDER BY p.name, pv.size, pv.color
-            ");
+        // Get filter parameters
+        $store_id = isset($_GET['store_id']) ? $_GET['store_id'] : null;
+        $status_filter = isset($_GET['status']) ? $_GET['status'] : null; // low, out, normal
+
+        // Base query
+        $sql = "
+            SELECT 
+                i.inventory_id,
+                i.quantity_on_hand,
+                i.last_updated,
+                p.id as product_id,
+                p.name as product_name,
+                p.sku as product_sku,
+                p.image as product_image,
+                v.variant_id,
+                v.size,
+                v.color,
+                v.variant_sku,
+                s.store_id,
+                s.store_name
+            FROM inventory i
+            JOIN products p ON i.product_id = p.id
+            LEFT JOIN product_variants v ON i.variant_id = v.variant_id
+            JOIN stores s ON i.store_id = s.store_id
+            WHERE 1=1
+        ";
+
+        $params = [];
+        if ($store_id) {
+            $sql .= " AND i.store_id = ?";
+            $params[] = $store_id;
         }
-        $inventory = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($inventory);
+
+        $sql .= " ORDER BY i.quantity_on_hand ASC"; // Show lowest stock first
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $inventory_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Process data for Status and AI Recommendations
+        $processed_data = [];
         
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $data = json_decode(file_get_contents("php://input"), true);
-        
-        if (isset($data['action']) && $data['action'] === 'adjust') {
-            // Stock adjustment
-            $pdo->beginTransaction();
+        foreach ($inventory_items as $item) {
+            $qty = (int)$item['quantity_on_hand'];
             
-            // Update inventory
-            $stmt = $pdo->prepare("
-                UPDATE inventory 
-                SET quantity_on_hand = quantity_on_hand + ? 
-                WHERE inventory_id = ?
-            ");
-            $stmt->execute([$data['quantity_change'], $data['inventory_id']]);
-            
-            // Log the adjustment
-            $stmt = $pdo->prepare("
-                INSERT INTO stock_adjustments (inventory_id, user_id, adjustment_type, quantity_change, reason) 
-                VALUES (?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $data['inventory_id'],
-                $_SESSION['user_id'],
-                $data['adjustment_type'] ?? 'Addition',
-                $data['quantity_change'],
-                $data['reason'] ?? null
-            ]);
-            
-            $pdo->commit();
-            echo json_encode(['success' => true, 'message' => 'Điều chỉnh tồn kho thành công']);
-        } else {
-            // Create or update inventory record
-            if (isset($data['inventory_id']) && $data['inventory_id']) {
-                $stmt = $pdo->prepare("
-                    UPDATE inventory 
-                    SET quantity_on_hand = ?, low_stock_threshold = ?
-                    WHERE inventory_id = ?
-                ");
-                $stmt->execute([
-                    $data['quantity_on_hand'],
-                    $data['low_stock_threshold'] ?? 10,
-                    $data['inventory_id']
-                ]);
-            } else {
-                $stmt = $pdo->prepare("
-                    INSERT INTO inventory (product_id, variant_id, store_id, quantity_on_hand, low_stock_threshold) 
-                    VALUES (?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE quantity_on_hand = VALUES(quantity_on_hand)
-                ");
-                $stmt->execute([
-                    $data['product_id'],
-                    $data['variant_id'] ?? null,
-                    $data['store_id'] ?? 1,
-                    $data['quantity_on_hand'] ?? 0,
-                    $data['low_stock_threshold'] ?? 10
-                ]);
+            // 1. Determine Status
+            $status = 'normal';
+            if ($qty <= 0) {
+                $status = 'out_of_stock';
+            } elseif ($qty <= 10) {
+                $status = 'low_stock';
             }
-            echo json_encode(['success' => true, 'message' => 'Cập nhật tồn kho thành công']);
+
+            // Filter by status if requested
+            if ($status_filter && $status_filter !== $status) {
+                continue; 
+            }
+
+            // 2. Generate AI Recommendation
+            $ai_recommendation = null;
+            if ($status === 'out_of_stock') {
+                $ai_recommendation = [
+                    'action' => 'Urgent Replenish',
+                    'quantity' => 50, // Simple rule: Target 50
+                    'reason' => 'Stock is completely depleted. Potential sales loss.',
+                    'priority' => 'critical'
+                ];
+            } elseif ($status === 'low_stock') {
+                $deficit = 20 - $qty; // Target 20 for low stock
+                $ai_recommendation = [
+                    'action' => 'Restock',
+                    'quantity' => max(10, $deficit),
+                    'reason' => "Stock ($qty) is below safety threshold (10).",
+                    'priority' => 'high'
+                ];
+            }
+
+            // Format Item Name
+            $sku = $item['variant_sku'] ? $item['variant_sku'] : $item['product_sku'];
+            $name = $item['product_name'];
+            if ($item['size'] || $item['color']) {
+                $name .= " (" . trim($item['color'] . ' ' . $item['size']) . ")";
+            }
+
+            $processed_data[] = [
+                'id' => $item['inventory_id'],
+                'product_name' => $name,
+                'sku' => $sku,
+                'image' => $item['product_image'],
+                'store_name' => $item['store_name'],
+                'quantity' => $qty,
+                'status' => $status,
+                'last_updated' => $item['last_updated'],
+                'ai_recommendation' => $ai_recommendation
+            ];
         }
+
+        echo json_encode($processed_data);
     }
-} catch (PDOException $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }

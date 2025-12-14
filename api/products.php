@@ -50,6 +50,27 @@ try {
         exit;
     }
     
+    // Barcode search (for POS barcode scanner)
+    if (isset($_GET['barcode'])) {
+        $barcode = trim($_GET['barcode']);
+        $stmt = $pdo->prepare("
+            SELECT p.*, c.name as category_name 
+            FROM products p 
+            LEFT JOIN categories c ON p.category_id = c.id 
+            WHERE p.barcode = ? AND p.is_active = 1
+        ");
+        $stmt->execute([$barcode]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($product) {
+            echo json_encode($product);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Product not found']);
+        }
+        exit;
+    }
+    
     // Generate cache key from all query params
     $cacheKey = 'products_' . md5(json_encode($_GET));
     
@@ -129,10 +150,13 @@ try {
     $total = $countStmt->fetch()['total'];
     
     // Main query with pagination
-    $sql = "SELECT p.*, c.name as category_name 
+    $sql = "SELECT p.*, c.name as category_name, 
+            COALESCE(SUM(i.quantity_on_hand), 0) as total_quantity
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
+            LEFT JOIN inventory i ON p.id = i.product_id
             WHERE {$whereClause} 
+            GROUP BY p.id
             ORDER BY {$orderBy} 
             LIMIT {$limit} OFFSET {$offset}";
     

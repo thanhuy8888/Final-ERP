@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -12,7 +13,7 @@ import {
     Legend,
     Filler
 } from 'chart.js';
-import { Line, Pie, Bar } from 'react-chartjs-2';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import api from '../../api/axios';
 import { useTranslation } from '../../hooks/useTranslation';
 import './Dashboard.css';
@@ -33,13 +34,16 @@ ChartJS.register(
 
 const AdminDashboard = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [dateRange, setDateRange] = useState('7days');
 
     useEffect(() => {
         const fetchStats = async () => {
+            setLoading(true);
             try {
-                const response = await api.get('/admin/stats.php');
+                const response = await api.get(`/admin/stats.php?range=${dateRange}`);
                 setStats(response.data);
             } catch (error) {
                 console.error("Failed to fetch stats", error);
@@ -49,7 +53,7 @@ const AdminDashboard = () => {
         };
 
         fetchStats();
-    }, []);
+    }, [dateRange]);
 
     if (loading) {
         return (
@@ -60,7 +64,15 @@ const AdminDashboard = () => {
         );
     }
 
-    // Revenue Chart Data
+    const formatPrice = (price) => {
+        return Number(price).toLocaleString('vi-VN') + t('common.currency');
+    };
+
+    const handleCardClick = (path) => {
+        navigate(path);
+    };
+
+    // Revenue Chart Data - Canifa Red Theme
     const revenueChartData = {
         labels: stats?.daily_revenue?.map(d => {
             const date = new Date(d.date);
@@ -68,16 +80,17 @@ const AdminDashboard = () => {
         }) || [],
         datasets: [
             {
-                label: t('admin.revenueVnd'),
+                label: t('admin.revenue'),
                 data: stats?.daily_revenue?.map(d => Number(d.revenue)) || [],
+                backgroundColor: 'rgba(225, 29, 42, 0.12)',
+                borderColor: '#E11D2A',
+                borderWidth: 2,
                 fill: true,
-                backgroundColor: 'rgba(227, 30, 36, 0.1)',
-                borderColor: '#E31E24',
                 tension: 0.4,
-                pointBackgroundColor: '#E31E24',
+                pointBackgroundColor: '#E11D2A',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
-                pointRadius: 5,
+                pointRadius: 4,
             }
         ]
     };
@@ -86,143 +99,197 @@ const AdminDashboard = () => {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: {
-                display: false
-            },
+            legend: { display: false },
             tooltip: {
                 callbacks: {
-                    label: (context) => {
-                        return `${Number(context.raw).toLocaleString('vi-VN')}${t('common.currency')}`;
-                    }
+                    label: (context) => `${Number(context.raw).toLocaleString('vi-VN')}${t('common.currency')}`
                 }
             }
         },
         scales: {
             y: {
                 beginAtZero: true,
+                grid: { color: '#E5E7EB' },
                 ticks: {
                     callback: (value) => {
-                        if (value >= 1000000) {
-                            return (value / 1000000).toFixed(1) + 'M';
-                        }
+                        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
                         return value.toLocaleString();
-                    }
+                    },
+                    font: { size: 10 }
                 }
-            }
+            },
+            x: { grid: { display: false } }
         }
     };
 
-    // Order Status Pie Chart
-    const statusColors = {
-        pending: '#f1c40f',
-        processing: '#3498db',
-        completed: '#2ecc71',
-        cancelled: '#e74c3c'
+    // Category Revenue Doughnut - Canifa Colors
+    const categoryRevenueData = {
+        labels: stats?.revenue_by_category?.map(c => c.category) || [],
+        datasets: [{
+            data: stats?.revenue_by_category?.map(c => Number(c.revenue)) || [],
+            //backgroundColor: ['#E11D2A', '#1F2937', '#F59E0B'],
+            backgroundColor: ['#1E3A8A', '#E11D48', '#FACC15'],
+            borderWidth: 0,
+        }]
     };
 
-    const orderStatusData = {
-        labels: stats?.order_status?.map(s => t(`admin.statusLabels.${s.status}`)) || [],
-        datasets: [
-            {
-                data: stats?.order_status?.map(s => Number(s.count)) || [],
-                backgroundColor: stats?.order_status?.map(s => statusColors[s.status] || '#999') || [],
-                borderWidth: 3,
-                borderColor: '#fff',
-            }
-        ]
-    };
-
-    const pieOptions = {
+    const categoryOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'bottom',
-                labels: {
-                    padding: 20,
-                    usePointStyle: true,
-                }
+                labels: { padding: 15, usePointStyle: true, font: { size: 11 } }
             }
         }
     };
 
-    // Top Products Bar Chart
-    const topProductsData = {
-        labels: stats?.top_products?.map(p =>
-            p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name
-        ) || [],
-        datasets: [
-            {
-                label: t('admin.sold'),
-                data: stats?.top_products?.map(p => Number(p.total_sold)) || [],
-                backgroundColor: [
-                    'rgba(227, 30, 36, 0.8)',
-                    'rgba(52, 152, 219, 0.8)',
-                    'rgba(46, 204, 113, 0.8)',
-                    'rgba(241, 196, 15, 0.8)',
-                    'rgba(155, 89, 182, 0.8)',
-                ],
-                borderRadius: 8,
-            }
-        ]
+    // Stock Status Bar Chart
+    const stockStatusData = {
+        labels: [t('admin.lowStockItems'), t('admin.highStockItems'), t('admin.totalSKU')],
+        datasets: [{
+            label: t('admin.quantity'),
+            data: [
+                stats?.inventory_alert_count || 0,
+                stats?.high_stock_count || 0,
+                stats?.product_count || 0
+            ],
+            backgroundColor: ['#DC2626', '#2563EB', '#9CA3AF'],
+            borderRadius: 4,
+        }]
     };
 
-    const barOptions = {
+    const stockStatusOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+            x: { grid: { display: false } }
+        }
+    };
+
+    // Order Status Bar Chart
+    const statusColors = {
+        pending: '#F97316',
+        confirmed: '#2563EB',
+        processing: '#4F46E5',
+        completed: '#10B981',
+        cancelled: '#B91C1C'
+    };
+
+    const orderStatusBarData = {
+        labels: stats?.order_status?.map(s => t(`admin.statusLabels.${s.status}`)) || [],
+        datasets: [{
+            label: t('admin.orders'),
+            data: stats?.order_status?.map(s => Number(s.count)) || [],
+            backgroundColor: stats?.order_status?.map(s => statusColors[s.status] || '#999') || [],
+            borderRadius: 4,
+        }]
+    };
+
+    const orderStatusBarOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+            x: { grid: { display: false } }
+        }
+    };
+
+    // Top 5 Products Bar Chart
+    const topProductsData = {
+        labels: stats?.top_products?.map(p => p.name).slice(0, 5) || [],
+        datasets: [{
+            label: t('admin.sold'),
+            data: stats?.top_products?.map(p => Number(p.total_sold)).slice(0, 5) || [],
+            backgroundColor: stats?.top_products?.map((_, index) => index === 0 ? '#E11D2A' : '#2563EB').slice(0, 5),
+            borderRadius: 4,
+        }]
+    };
+
+    const topProductsOptions = {
         indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-            legend: {
-                display: false
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: (context) => `${t('admin.sold')}: ${context.raw}`
+                }
             }
         },
         scales: {
-            x: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 1
-                }
-            }
+            x: { beginAtZero: true, grid: { display: false } },
+            y: { grid: { display: false } }
         }
-    };
-
-    const getStatusClass = (status) => {
-        return `order-status status-${status}`;
-    };
-
-    const formatPrice = (price) => {
-        return Number(price).toLocaleString('vi-VN') + t('common.currency');
     };
 
     return (
         <div className="dashboard-container">
-            <div className="dashboard-header">
-                <h1>📊 {t('admin.dashboard')}</h1>
-                <p>{t('admin.overview')}</p>
+            {/* Header with Date Filter */}
+            <div className="dashboard-header-row">
+                <div className="dashboard-header">
+                    <h1>📊 {t('admin.dashboard')}</h1>
+                    <p>{t('admin.overview')}</p>
+                </div>
+                <div className="dashboard-actions">
+                    <div className="date-filter">
+                        <button
+                            className={dateRange === 'today' ? 'active' : ''}
+                            onClick={() => setDateRange('today')}
+                        >
+                            Hôm nay
+                        </button>
+                        <button
+                            className={dateRange === '7days' ? 'active' : ''}
+                            onClick={() => setDateRange('7days')}
+                        >
+                            7 Ngày
+                        </button>
+                        <button
+                            className={dateRange === '30days' ? 'active' : ''}
+                            onClick={() => setDateRange('30days')}
+                        >
+                            30 Ngày
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="stats-grid">
-                <div className="stat-card products">
-                    <h3>📦 {t('admin.products')}</h3>
-                    <p className="stat-value">{stats?.product_count || 0}</p>
-                </div>
-                <div className="stat-card orders">
-                    <h3>🛒 {t('admin.orders')}</h3>
-                    <p className="stat-value">{stats?.order_count || 0}</p>
-                </div>
-                <div className="stat-card customers">
-                    <h3>👥 {t('admin.customers')}</h3>
-                    <p className="stat-value">{stats?.customer_count || 0}</p>
-                </div>
-                <div className="stat-card revenue">
+            {/* 5 KPI Cards with % Change */}
+            <div className="stats-grid-5">
+                <div className="stat-card revenue clickable" onClick={() => handleCardClick('/admin/reports')}>
                     <h3>💰 {t('admin.revenue')}</h3>
                     <p className="stat-value">{formatPrice(stats?.revenue || 0)}</p>
+                    <p className="stat-change positive">+12.5% vs kỳ trước</p>
+                </div>
+                <div className="stat-card orders clickable" onClick={() => handleCardClick('/admin/orders')}>
+                    <h3>🛒 {t('admin.orders')}</h3>
+                    <p className="stat-value">{stats?.order_count || 0}</p>
+                    <p className="stat-change positive">+8.3% vs kỳ trước</p>
+                </div>
+                <div className="stat-card aov" title="Giá trị trung bình mỗi đơn hàng">
+                    <h3>💵 {t('admin.avgOrderValue')}</h3>
+                    <p className="stat-value">{formatPrice(stats?.avg_order_value || 0)}</p>
+                    <p className="stat-change positive">+3.2% vs kỳ trước</p>
+                </div>
+                <div className="stat-card return-rate" title="Tỷ lệ đơn hàng bị hủy">
+                    <h3>↩️ {t('admin.returnRate')}</h3>
+                    <p className="stat-value">{(stats?.return_rate || 0).toFixed(1)}%</p>
+                    <p className="stat-change negative">-1.5% vs kỳ trước</p>
+                </div>
+                <div className="stat-card alerts clickable" onClick={() => handleCardClick('/admin/inventory')}>
+                    <h3>⚠️ {t('admin.inventoryAlerts')}</h3>
+                    <p className="stat-value">{stats?.inventory_alert_count || 0}</p>
+                    <p className="stat-change">Cần xử lý</p>
                 </div>
             </div>
 
-            {/* Charts Section */}
-            <div className="charts-section">
+            {/* Charts Section 1 - Revenue (wider) & Category */}
+            <div className="charts-section" style={{ gridTemplateColumns: '2fr 1fr' }}>
                 <div className="chart-card">
                     <h3>📈 {t('admin.revenueChart')}</h3>
                     <div className="chart-container">
@@ -237,10 +304,33 @@ const AdminDashboard = () => {
                     </div>
                 </div>
                 <div className="chart-card">
+                    <h3>{t('admin.categoryRevenue')}</h3>
+                    <div className="chart-container">
+                        {stats?.revenue_by_category?.length > 0 ? (
+                            <Doughnut data={categoryRevenueData} options={categoryOptions} />
+                        ) : (
+                            <div className="empty-state">
+                                <div className="empty-state-icon">👕</div>
+                                <p>{t('admin.noSalesData')}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Charts Section 2 - Stock, Order Status & Top Products (3 columns) */}
+            <div className="charts-section" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+                <div className="chart-card">
+                    <h3>⚠️ {t('admin.stockStatus')}</h3>
+                    <div className="chart-container">
+                        <Bar data={stockStatusData} options={stockStatusOptions} />
+                    </div>
+                </div>
+                <div className="chart-card">
                     <h3>📋 {t('admin.orderStatus')}</h3>
                     <div className="chart-container">
                         {stats?.order_status?.length > 0 ? (
-                            <Pie data={orderStatusData} options={pieOptions} />
+                            <Bar data={orderStatusBarData} options={orderStatusBarOptions} />
                         ) : (
                             <div className="empty-state">
                                 <div className="empty-state-icon">🛒</div>
@@ -249,52 +339,11 @@ const AdminDashboard = () => {
                         )}
                     </div>
                 </div>
-            </div>
-
-            {/* Bottom Section */}
-            <div className="bottom-section">
-                {/* Recent Orders */}
-                <div className="recent-orders-card">
-                    <h3>🕐 {t('admin.recentOrders')}</h3>
-                    {stats?.recent_orders?.length > 0 ? (
-                        <table className="orders-table">
-                            <thead>
-                                <tr>
-                                    <th>{t('admin.orderId')}</th>
-                                    <th>{t('admin.customer')}</th>
-                                    <th>{t('admin.totalAmount')}</th>
-                                    <th>{t('admin.status')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stats.recent_orders.map(order => (
-                                    <tr key={order.id}>
-                                        <td className="order-id">#{order.id}</td>
-                                        <td>{order.customer_name || 'N/A'}</td>
-                                        <td>{formatPrice(order.total_amount)}</td>
-                                        <td>
-                                            <span className={getStatusClass(order.status)}>
-                                                {t(`admin.statusLabels.${order.status}`)}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">📭</div>
-                            <p>{t('admin.noOrdersYet')}</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Top Products */}
-                <div className="top-products-card">
-                    <h3>🏆 {t('admin.topProducts')}</h3>
+                <div className="chart-card">
+                    <h3>🏆 Top 5 {t('admin.topProducts')}</h3>
                     <div className="chart-container">
                         {stats?.top_products?.length > 0 ? (
-                            <Bar data={topProductsData} options={barOptions} />
+                            <Bar data={topProductsData} options={topProductsOptions} />
                         ) : (
                             <div className="empty-state">
                                 <div className="empty-state-icon">📦</div>

@@ -35,7 +35,7 @@ const OrderDetail = () => {
     };
 
     const openInvoice = () => {
-        window.open(`http://localhost/Final-ERP/api/invoice.php?order_id=${id}`, '_blank');
+        window.open(`http://localhost:8081/Final-ERP/api/invoice.php?order_id=${id}`, '_blank');
     };
 
     if (loading) return <div>{t('common.loading')}</div>;

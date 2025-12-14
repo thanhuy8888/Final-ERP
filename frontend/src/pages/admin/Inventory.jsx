@@ -1,206 +1,383 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useToast } from '../../contexts/ToastContext';
+import {
+    Search,
+    Filter,
+    AlertTriangle,
+    CheckCircle,
+    XCircle,
+    Bot,
+    RefreshCw,
+    Plus,
+    ArrowRight,
+    Save,
+    Edit
+} from 'lucide-react';
+import StockAdjustmentModal from '../../components/modals/StockAdjustmentModal';
+import './Inventory.css';
 
-const AdminInventory = () => {
+const Inventory = () => {
     const { t } = useTranslation();
+    const { showError } = useToast();
     const [inventory, setInventory] = useState([]);
-    const [lowStock, setLowStock] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showAdjustForm, setShowAdjustForm] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [selectedItem, setSelectedItem] = useState(null);
-    const [adjustData, setAdjustData] = useState({
-        quantity_change: 0,
-        adjustment_type: 'Addition',
-        reason: ''
-    });
-    const [message, setMessage] = useState({ type: '', text: '' });
+    const [detailLoading, setDetailLoading] = useState(false);
+    const [itemHistory, setItemHistory] = useState({ sales: [], audits: [] });
+    const [aiModal, setAiModal] = useState(null); // { open: false, item: null }
 
-    const fetchInventory = async () => {
-        try {
-            const [invRes, lowRes] = await Promise.all([
-                api.get('/admin/inventory.php'),
-                api.get('/admin/inventory.php?low_stock=1')
-            ]);
-            setInventory(invRes.data);
-            setLowStock(lowRes.data);
-        } catch (error) {
-            console.error("Failed to fetch inventory", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Adjustment Modal State
+    const [adjustModal, setAdjustModal] = useState({
+        open: false,
+        step: 1,
+        item: null,
+        type: 'increase',
+        quantity: 0,
+        reason: '',
+        note: ''
+    });
+    const REASONS = [
+        'Damaged goods',
+        'Lost / Missing items',
+        'Stock audit correction',
+        'Initial stock import',
+        'System correction'
+    ];
 
     useEffect(() => {
         fetchInventory();
     }, []);
 
-    const handleAdjust = async (e) => {
-        e.preventDefault();
+    const fetchInventory = async () => {
+        setLoading(true);
         try {
-            const response = await api.post('/admin/inventory.php', {
-                action: 'adjust',
-                inventory_id: selectedItem.inventory_id,
-                ...adjustData
-            });
-            if (response.data.success) {
-                setMessage({ type: 'success', text: response.data.message });
-                setShowAdjustForm(false);
-                fetchInventory();
-            }
+            const response = await api.get('/admin/inventory.php');
+            setInventory(response.data);
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Error' });
+            console.error(error);
+            showError('Failed to fetch inventory data');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const openAdjustForm = (item) => {
+    const handleViewDetail = async (item) => {
         setSelectedItem(item);
-        setAdjustData({ quantity_change: 0, adjustment_type: 'Addition', reason: '' });
-        setShowAdjustForm(true);
+        setDetailLoading(true);
+        try {
+            const response = await api.get(`/admin/inventory_details.php?inventory_id=${item.id}`);
+            setItemHistory({
+                sales: response.data.sales_history || [],
+                audits: response.data.audit_logs || []
+            });
+        } catch (error) {
+            console.error(error);
+            showError('Failed to load item details');
+        } finally {
+            setDetailLoading(false);
+        }
     };
 
-    if (loading) return <div>{t('common.loading')}</div>;
+    // Open Stock Adjustment Modal
+    const openAdjustmentModal = (item, prefill = {}) => {
+        setAdjustModal({
+            open: true,
+            step: 1,
+            item: item,
+            type: prefill.type || 'increase',
+            quantity: prefill.quantity || '',
+            reason: prefill.reason || '',
+            note: ''
+        });
+        if (aiModal) setAiModal(null);
+    };
+
+
+    const handleAiClick = (item) => {
+        setAiModal(item);
+    };
+
+    // Filtering logic
+    const filteredInventory = inventory.filter(item => {
+        const matchesSearch = item.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.sku.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    const getStatusBadge = (status) => {
+        if (status === 'out_of_stock') {
+            return <span className="status-badge badge-red"><XCircle size={14} /> Out of Stock</span>;
+        }
+        if (status === 'low_stock') {
+            return <span className="status-badge badge-yellow"><AlertTriangle size={14} /> Low Stock</span>;
+        }
+        return <span className="status-badge badge-green"><CheckCircle size={14} /> Normal</span>;
+    };
+
+    const formatChangeLog = (newValueStr) => {
+        try {
+            const val = JSON.parse(newValueStr);
+            if (typeof val === 'object' && val !== null) {
+                return (
+                    <div className="change-log">
+                        {Object.entries(val).map(([k, v]) => (
+                            <div key={k}>
+                                <span className="font-semibold">{k}:</span> {String(v)}
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+            return <div className="change-log">{String(val)}</div>;
+        } catch (e) {
+            return <div className="change-log">{newValueStr}</div>;
+        }
+    };
 
     return (
-        <div>
-            <div className="admin-header">
-                <h1>{t('admin.inventoryManagement')}</h1>
+        <div className="inventory-page">
+            <div className="page-header">
+                <div>
+                    <h1>Stock Overview</h1>
+                    <p className="subtitle">Real-time inventory levels</p>
+                </div>
+                <button className="btn-refresh" onClick={fetchInventory} title="Refresh Data">
+                    <RefreshCw size={18} /> Refresh Data
+                </button>
             </div>
 
-            {message.text && (
-                <div style={{
-                    padding: '10px 15px',
-                    marginBottom: '15px',
-                    borderRadius: '5px',
-                    background: message.type === 'success' ? '#d4edda' : '#f8d7da',
-                    color: message.type === 'success' ? '#155724' : '#721c24'
-                }}>
-                    {message.text}
+            <div className="content-card">
+                <div className="toolbar">
+                    <div className="search-bar">
+                        <Search size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search by Product or SKU..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="filter-group">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="status-filter"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="low_stock">Low Stock (Risk)</option>
+                            <option value="out_of_stock">Out of Stock</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </div>
                 </div>
-            )}
 
-            {lowStock.length > 0 && (
-                <div className="admin-card" style={{ marginBottom: '20px', borderLeft: '4px solid #e74c3c' }}>
-                    <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>⚠️ Low Stock Alert ({lowStock.length} {t('common.products')})</h3>
-                    <table className="admin-table">
-                        <thead>
-                            <tr>
-                                <th>{t('admin.productName')}</th>
-                                <th>{t('product.size')}/{t('product.color')}</th>
-                                <th>{t('admin.stock')}</th>
-                                <th>Threshold</th>
-                                <th>{t('admin.actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {lowStock.slice(0, 5).map(item => (
-                                <tr key={item.inventory_id}>
-                                    <td>{item.product_name}</td>
-                                    <td>{item.size} / {item.color}</td>
-                                    <td style={{ color: '#e74c3c', fontWeight: 'bold' }}>{item.quantity_on_hand}</td>
-                                    <td>{item.low_stock_threshold}</td>
-                                    <td>
-                                        <button onClick={() => openAdjustForm(item)} className="btn-primary" style={{ padding: '5px 10px', fontSize: '12px' }}>
-                                            {t('admin.adjust')}
-                                        </button>
-                                    </td>
+                {loading ? (
+                    <div className="loading-wrapper">
+                        <div className="spinner"></div> Loading Inventory...
+                    </div>
+                ) : (
+                    <div className="table-container">
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>SKU</th>
+                                    <th>Store</th>
+                                    <th className="text-center">Quantity</th>
+                                    <th className="text-center">Status</th>
+                                    <th>Recommendation</th>
+                                    <th>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {showAdjustForm && selectedItem && (
-                <div className="admin-card" style={{ marginBottom: '20px' }}>
-                    <h3>{t('admin.adjustStock')}: {selectedItem.product_name} ({selectedItem.size}/{selectedItem.color})</h3>
-                    <p>{t('admin.currentStock')}: <strong>{selectedItem.quantity_on_hand}</strong></p>
-                    <form onSubmit={handleAdjust}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '15px', marginTop: '15px' }}>
-                            <div>
-                                <label>Type</label>
-                                <select
-                                    value={adjustData.adjustment_type}
-                                    onChange={(e) => setAdjustData({ ...adjustData, adjustment_type: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                >
-                                    <option value="Addition">Add</option>
-                                    <option value="Deduction">Deduct</option>
-                                    <option value="Initial">Initial</option>
-                                    <option value="Transfer">Transfer</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>{t('product.quantity')}</label>
-                                <input
-                                    type="number"
-                                    value={adjustData.quantity_change}
-                                    onChange={(e) => setAdjustData({ ...adjustData, quantity_change: parseInt(e.target.value) })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>Reason</label>
-                                <input
-                                    type="text"
-                                    value={adjustData.reason}
-                                    onChange={(e) => setAdjustData({ ...adjustData, reason: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                        </div>
-                        <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-                            <button type="submit" className="btn-primary">{t('common.confirm')}</button>
-                            <button type="button" onClick={() => setShowAdjustForm(false)} style={{
-                                padding: '10px 20px',
-                                border: '1px solid #ddd',
-                                borderRadius: '5px',
-                                background: 'white',
-                                cursor: 'pointer'
-                            }}>{t('common.cancel')}</button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className="admin-card">
-                <h3>{t('admin.inventory')}</h3>
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>{t('admin.productName')}</th>
-                            <th>{t('product.size')}</th>
-                            <th>{t('product.color')}</th>
-                            <th>Store</th>
-                            <th>{t('admin.stock')}</th>
-                            <th>Reserved</th>
-                            <th>{t('admin.actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {inventory.map(item => (
-                            <tr key={item.inventory_id}>
-                                <td>{item.product_name}</td>
-                                <td>{item.size || '-'}</td>
-                                <td>{item.color || '-'}</td>
-                                <td>{item.store_name}</td>
-                                <td style={{
-                                    color: item.quantity_on_hand <= item.low_stock_threshold ? '#e74c3c' : 'inherit',
-                                    fontWeight: item.quantity_on_hand <= item.low_stock_threshold ? 'bold' : 'normal'
-                                }}>
-                                    {item.quantity_on_hand}
-                                </td>
-                                <td>{item.reserved_quantity || 0}</td>
-                                <td>
-                                    <button onClick={() => openAdjustForm(item)} className="btn-edit">📦 {t('admin.adjust')}</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                {filteredInventory.map((item) => (
+                                    <tr key={item.id} className={item.status !== 'normal' ? 'row-alert' : ''}>
+                                        <td onClick={() => handleViewDetail(item)} style={{ cursor: 'pointer' }}>
+                                            <div className="product-cell">
+                                                {item.image ? (
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.product_name}
+                                                        className="product-thumb"
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/40?text=IMG'; }}
+                                                    />
+                                                ) : (
+                                                    <div className="product-thumb placeholder">IMG</div>
+                                                )}
+                                                <div>
+                                                    <div className="product-name">{item.product_name}</div>
+                                                    <small className="text-muted">Last updated: {item.last_updated?.split(' ')[0]}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="font-mono text-blue cursor-pointer" onClick={() => handleViewDetail(item)}>{item.sku}</td>
+                                        <td>{item.store_name}</td>
+                                        <td className="text-center">
+                                            <span className={`qty-indicator ${item.status}`}>
+                                                {item.quantity}
+                                            </span>
+                                        </td>
+                                        <td className="text-center">{getStatusBadge(item.status)}</td>
+                                        <td>
+                                            {item.ai_recommendation ? (
+                                                <div className="ai-pill" onClick={() => handleAiClick(item)} style={{ cursor: 'pointer' }}>
+                                                    <Bot size={16} className="ai-icon" />
+                                                    <div className="ai-content">
+                                                        <strong>{item.ai_recommendation.action} +{item.ai_recommendation.quantity}</strong>
+                                                        <div className="ai-reason">{item.ai_recommendation.reason}</div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted text-xs">-</span>
+                                            )}
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="btn-icon"
+                                                title="Adjust Stock"
+                                                onClick={() => openAdjustmentModal(item)}
+                                            >
+                                                <Edit size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filteredInventory.length === 0 && (
+                                    <tr>
+                                        <td colSpan="6" className="text-center py-5 text-muted">
+                                            No inventory items found matching your filters.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
+
+            {/* SKU Detail Modal */}
+            {selectedItem && (
+                <div className="modal-overlay" onClick={() => setSelectedItem(null)}>
+                    <div className="modal-content large-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>{selectedItem.product_name} <span className="text-muted text-sm">({selectedItem.sku})</span></h3>
+                            <button className="btn-close" onClick={() => setSelectedItem(null)}>
+                                <XCircle size={20} />
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            {detailLoading ? (
+                                <div className="loading-wrapper"><div className="spinner"></div></div>
+                            ) : (
+                                <div className="detail-sections">
+                                    <div className="detail-section">
+                                        <h4>Sales History (Last 10 Orders)</h4>
+                                        <table className="mini-table">
+                                            <thead><tr><th>Date</th><th>Order ID</th><th>Qty</th><th>Customer</th></tr></thead>
+                                            <tbody>
+                                                {itemHistory.sales.map(sale => (
+                                                    <tr key={sale.order_id}>
+                                                        <td>{new Date(sale.created_at).toLocaleDateString('vi-VN')}</td>
+                                                        <td className="text-blue">#{sale.order_id}</td>
+                                                        <td className="font-bold">{sale.quantity}</td>
+                                                        <td>{sale.customer_name || 'Guest'}</td>
+                                                    </tr>
+                                                ))}
+                                                {itemHistory.sales.length === 0 && <tr><td colSpan="4" className="text-center text-muted">No sales history</td></tr>}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="detail-section">
+                                        <h4>Audit Logs</h4>
+                                        <table className="mini-table">
+                                            <thead><tr><th>Date</th><th>User</th><th>Action</th><th>Changes</th></tr></thead>
+                                            <tbody>
+                                                {itemHistory.audits.map((log, idx) => (
+                                                    <tr key={idx}>
+                                                        <td>{new Date(log.created_at).toLocaleDateString('vi-VN')}</td>
+                                                        <td>{log.user_name}</td>
+                                                        <td><span className="badge-text">{log.action}</span></td>
+                                                        <td>{formatChangeLog(log.new_value)}</td>
+                                                    </tr>
+                                                ))}
+                                                {itemHistory.audits.length === 0 && <tr><td colSpan="4" className="text-center text-muted">No audit logs</td></tr>}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* AI Recommendation Modal */}
+            {/* Stock Adjustment Modal */}
+            <StockAdjustmentModal
+                isOpen={adjustModal.open}
+                onClose={() => setAdjustModal({ ...adjustModal, open: false })}
+                onSuccess={fetchInventory}
+                initialItem={adjustModal.item}
+                initialData={{
+                    type: adjustModal.type,
+                    quantity: adjustModal.quantity,
+                    reason: adjustModal.reason
+                }}
+            />
+
+            {aiModal && (
+                <div className="modal-overlay" onClick={() => setAiModal(null)}>
+                    <div className="modal-content ai-modal" onClick={e => e.stopPropagation()}>
+                        <div className="ai-header">
+                            <Bot size={32} />
+                            <div>
+                                <h3>AI Replenishment Advice</h3>
+                                <p className="text-sm opacity-90">Powered by Canifa Intelligence</p>
+                            </div>
+                        </div>
+                        <div className="ai-body">
+                            <div className="ai-metric-card">
+                                <label>Target Store</label>
+                                <div className="value">{aiModal.store_name}</div>
+                            </div>
+                            <div className="ai-metric-card warning">
+                                <label>Current Stock</label>
+                                <div className="value text-red">{aiModal.quantity} units</div>
+                            </div>
+
+                            <div className="ai-suggestion-box">
+                                <h4>✅ Recommended Action</h4>
+                                <div className="suggestion-main">
+                                    {aiModal.ai_recommendation?.action}
+                                    <span className="highlight"> +{aiModal.ai_recommendation?.quantity} units</span>
+                                </div>
+                                <p className="reason-text">"{aiModal.ai_recommendation?.reason}"</p>
+                                <div className="rule-explanation">
+                                    <strong>Why?</strong> Based on sales velocity of similar items in this region, maintaining a safety stock of 10-15 units avoids lost sales opportunities.
+                                </div>
+                            </div>
+
+                            <div className="modal-actions">
+                                <button className="btn-secondary" onClick={() => setAiModal(null)}>Dismiss</button>
+                                <button className="btn-primary" onClick={() => openAdjustmentModal(aiModal, {
+                                    type: 'increase',
+                                    quantity: aiModal.ai_recommendation?.quantity,
+                                    reason: 'System correction' // Default or map logic
+                                })}>
+                                    Create Stock Adjustment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default AdminInventory;
+export default Inventory;

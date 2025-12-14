@@ -164,7 +164,7 @@ const Orders = () => {
 
                                     <button
                                         className="btn-invoice"
-                                        onClick={() => window.open(`http://localhost/Final-ERP/api/invoice.php?order_id=${selectedOrder.id}`, '_blank')}
+                                        onClick={() => window.open(`http://localhost:8081/Final-ERP/api/invoice.php?order_id=${selectedOrder.id}`, '_blank')}
                                     >
                                         🧾 {t('orders.viewInvoice')}
                                     </button>

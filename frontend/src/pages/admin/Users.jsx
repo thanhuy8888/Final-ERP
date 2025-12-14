@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useTranslation } from '../../hooks/useTranslation';
+import { Trash, Edit, Plus, User, Mail, Phone, Shield, Check, X } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext';
 
 const AdminUsers = () => {
     const { t } = useTranslation();
+    const { success, error: showError } = useToast();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -17,7 +20,10 @@ const AdminUsers = () => {
         role: 'customer',
         is_active: true
     });
-    const [message, setMessage] = useState({ type: '', text: '' });
+
+    // Delete Confirmation State
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const fetchUsers = async () => {
         try {
@@ -40,14 +46,14 @@ const AdminUsers = () => {
             const payload = editingUser ? { ...formData, id: editingUser.id } : formData;
             const response = await api.post('/admin/users.php', payload);
             if (response.data.success) {
-                setMessage({ type: 'success', text: response.data.message });
+                success(response.data.message);
                 setShowForm(false);
                 setEditingUser(null);
                 resetForm();
                 fetchUsers();
             }
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Error' });
+            showError(error.response?.data?.error || 'Error saving user');
         }
     };
 
@@ -65,13 +71,22 @@ const AdminUsers = () => {
         setShowForm(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm(t('common.delete') + '?')) return;
+    const handleDeleteClick = (id) => {
+        setDeleteModal({ open: true, id });
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteModal.id) return;
+        setIsDeleting(true);
         try {
-            await api.delete('/admin/users.php', { data: { id } });
+            await api.delete('/admin/users.php', { data: { id: deleteModal.id } });
             fetchUsers();
+            setDeleteModal({ open: false, id: null });
+            success(t('common.deleteSuccess'));
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Delete failed' });
+            showError(error.response?.data?.error || 'Delete failed');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -104,7 +119,8 @@ const AdminUsers = () => {
                 color: 'white',
                 padding: '3px 8px',
                 borderRadius: '12px',
-                fontSize: '12px'
+                fontSize: '12px',
+                display: 'inline-block'
             }}>
                 {labels[role] || role.toUpperCase()}
             </span>
@@ -121,20 +137,10 @@ const AdminUsers = () => {
                     setShowForm(true);
                     setEditingUser(null);
                     resetForm();
-                }}>+ {t('admin.addUser')}</button>
+                }} style={{ background: '#3b82f6', border: 'none' }}>
+                    <Plus size={16} style={{ marginRight: '5px' }} /> {t('admin.addUser')}
+                </button>
             </div>
-
-            {message.text && (
-                <div style={{
-                    padding: '10px 15px',
-                    marginBottom: '15px',
-                    borderRadius: '5px',
-                    background: message.type === 'success' ? '#d4edda' : '#f8d7da',
-                    color: message.type === 'success' ? '#155724' : '#721c24'
-                }}>
-                    {message.text}
-                </div>
-            )}
 
             {showForm && (
                 <div className="admin-card" style={{ marginBottom: '20px' }}>
@@ -203,7 +209,7 @@ const AdminUsers = () => {
                             </div>
                         </div>
                         <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-                            <button type="submit" className="btn-primary">
+                            <button type="submit" className="btn-primary" style={{ background: '#3b82f6', border: 'none' }}>
                                 {editingUser ? t('common.save') : t('common.add')}
                             </button>
                             <button type="button" onClick={() => setShowForm(false)} style={{
@@ -247,14 +253,51 @@ const AdminUsers = () => {
                                     </span>
                                 </td>
                                 <td>
-                                    <button onClick={() => handleEdit(user)} className="btn-edit">✏️</button>
-                                    <button onClick={() => handleDelete(user.id)} className="btn-danger">🗑️</button>
+                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                        <button onClick={() => handleEdit(user)} className="btn-edit" title={t('common.edit')}>
+                                            <Edit size={16} />
+                                        </button>
+                                        <button onClick={() => handleDeleteClick(user.id)} className="btn-danger" title={t('common.delete')}>
+                                            <Trash size={16} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <div className="modal-overlay" onClick={() => setDeleteModal({ open: false, id: null })}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', color: '#EF4444' }}>
+                            <div style={{ background: '#FEE2E2', padding: '12px', borderRadius: '50%' }}>
+                                <Trash size={32} />
+                            </div>
+                        </div>
+                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>{t('common.delete')}?</h3>
+                        <p style={{ color: '#6B7280', marginBottom: '20px' }}>{t('common.deleteConfirm')}</p>
+                        <div className="modal-actions" style={{ justifyContent: 'center', gap: '10px' }}>
+                            <button
+                                className="btn-secondary"
+                                onClick={() => setDeleteModal({ open: false, id: null })}
+                                disabled={isDeleting}
+                            >
+                                {t('common.cancel')}
+                            </button>
+                            <button
+                                className="btn-primary"
+                                onClick={confirmDelete}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? t('common.processing') : t('common.delete')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

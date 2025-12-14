@@ -1,47 +1,92 @@
 /* Admin Dashboard Styles */
 
 .dashboard-container {
-    padding: 24px;
+    padding: 10px;
     max-width: 1400px;
     margin: 0 auto;
 }
 
 .dashboard-header {
-    margin-bottom: 32px;
+    margin-bottom: 8px;
 }
 
-.dashboard-header h1 {
-    color: #1a1a2e;
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
+.dashboard-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-.dashboard-header p {
+.dashboard-header {
+    margin-bottom: 0;
+}
+
+.date-filter {
+    display: flex;
+    gap: 8px;
+    background: white;
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.date-filter button {
+    background: transparent;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
     color: #666;
-    margin-top: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
 }
 
-/* Stats Grid */
+.date-filter button:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.date-filter button.active {
+    background: #E31E24;
+    color: white;
+}
+
+/* Stats Grid - Compact */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* Stats Grid - 5 Cards Layout */
+.stats-grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .stat-card {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border-left: 4px solid #E31E24;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 4px;
+    padding: 4px 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    border-left: 2px solid #E31E24;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-top: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-card.clickable {
+    cursor: pointer;
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card.products {
@@ -60,41 +105,68 @@
     border-left-color: #E31E24;
 }
 
+.stat-card.aov {
+    border-left-color: #9b59b6;
+}
+
+.stat-card.return-rate {
+    border-left-color: #e67e22;
+}
+
+.stat-card.alerts {
+    border-left-color: #e74c3c;
+}
+
 .stat-card h3 {
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.55rem;
     font-weight: 500;
-    margin: 0 0 8px 0;
+    margin: 0 0 2px 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.1px;
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #1a1a2e;
     margin: 0;
 }
 
 .stat-change {
-    font-size: 0.85rem;
-    color: #2ecc71;
-    margin-top: 8px;
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 3px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    font-weight: 600;
+}
+
+.stat-change.positive {
+    color: #2ecc71;
+}
+
+.stat-change.positive::before {
+    content: '↑';
+    font-weight: bold;
+    content: '↑ ';
 }
 
 .stat-change.negative {
     color: #e74c3c;
 }
 
+.stat-change.negative::before {
+    content: '↓ ';
+}
+
 /* Charts Section */
 .charts-section {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 @media (max-width: 1024px) {
@@ -105,30 +177,46 @@
 
 .chart-card {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .chart-card h3 {
     color: #1a1a2e;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0 0 20px 0;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #f5f5f5;
+    position: relative;
+}
+
+.chart-card h3::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: #E31E24;
 }
 
 .chart-container {
     position: relative;
-    height: 300px;
+    height: 140px;
 }
 
-/* Bottom Section */
+.chart-container-small {
+    position: relative;
+    height: 120px;
+}
+
+/* Bottom Section - Compact */
 .bottom-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    gap: 12px;
 }
 
 @media (max-width: 900px) {
@@ -140,17 +228,17 @@
 /* Recent Orders Table */
 .recent-orders-card {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .recent-orders-card h3 {
     color: #1a1a2e;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    margin: 0 0 20px 0;
-    padding-bottom: 12px;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
     border-bottom: 1px solid #eee;
 }
 
@@ -161,19 +249,19 @@
 
 .orders-table th {
     text-align: left;
-    padding: 12px 8px;
-    font-size: 0.8rem;
+    padding: 8px 6px;
+    font-size: 0.75rem;
     text-transform: uppercase;
     color: #666;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     border-bottom: 2px solid #eee;
 }
 
 .orders-table td {
-    padding: 12px 8px;
+    padding: 8px 6px;
     border-bottom: 1px solid #f5f5f5;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #333;
 }
 
@@ -188,9 +276,9 @@
 
 .order-status {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: capitalize;
 }
@@ -218,17 +306,17 @@
 /* Top Products Card */
 .top-products-card {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .top-products-card h3 {
     color: #1a1a2e;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    margin: 0 0 20px 0;
-    padding-bottom: 12px;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
     border-bottom: 1px solid #eee;
 }
 
@@ -236,7 +324,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #f5f5f5;
 }
 
@@ -245,17 +333,17 @@
 }
 
 .product-rank {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: linear-gradient(135deg, #E31E24, #c71a1f);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    margin-right: 12px;
+    margin-right: 10px;
 }
 
 .product-info {
@@ -273,7 +361,7 @@
 
 .product-sold {
     color: #666;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
 }
 
@@ -283,18 +371,18 @@
     justify-content: center;
     align-items: center;
     height: 400px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #666;
 }
 
 .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #E31E24;
+    width: 36px;
+    height: 36px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #E31E24;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-right: 16px;
+    margin-right: 12px;
 }
 
 @keyframes spin {
@@ -310,11 +398,11 @@
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: 40px;
+    padding: 30px;
     color: #999;
 }
 
 .empty-state-icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
 }

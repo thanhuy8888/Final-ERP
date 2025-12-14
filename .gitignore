@@ -1,37 +1,49 @@
-# Ignore uploaded files (can be large)
-# uploads/*.png
-# uploads/*.jpg
-# uploads/*.jpeg
-# uploads/*.gif
+# Dependencies
+node_modules/
+vendor/
 
-# Keep the uploads folder
-!uploads/.gitkeep
+# Environment variables
+.env
+.env.local
+.env.production
 
-# IDE specific files
+# Database config (IMPORTANT - don't push credentials!)
+includes/db.php
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# OS specific files
+# OS
 .DS_Store
 Thumbs.db
 
-# Temporary files
-*.tmp
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Dependencies
-# vendor/
-# frontend/node_modules/
+# Build outputs
+frontend/dist/
+frontend/build/
+
+# Uploads (if you have user-uploaded files)
+uploads/*
+!uploads/.gitkeep
 
 # Cache
-# Cache
-# cache/
+.cache/
+*.cache
 
-# Test/utility scripts (NOT in api folder)
-test_*.php
-fix_*.php
-insert_sample_products.php
-run_sales_migration.php
+# Temporary files
+tmp/
+temp/
+*.tmp
 
-# Keep important check files
-!api/check_auth.php
+# PHP
+composer.phar
+composer.lock

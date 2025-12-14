@@ -1,102 +1,170 @@
-# Final-ERP 
+# Final ERP System
 
-A comprehensive Fashion ERP System featuring a modern React Frontend and a robust PHP Backend. It includes Customer, Sales Staff, and Administration portals.
+A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend and React frontend.
 
-![Tech Stack](https://skillicons.dev/icons?i=react,vite,php,mysql,html,css)
+## 🚀 Features
 
-## 📂 Project Structure
+### Admin Dashboard
+- **Dashboard Overview**: Real-time KPIs, revenue charts, order status tracking
+- **Product Management**: Full CRUD operations, variant management, category management
+- **Order Management**: Order processing, returns handling, order tracking
+- **Inventory Management**: Stock tracking, stock adjustments, stock transfers between stores
+- **Customer & Loyalty**: Customer management, membership tiers, loyalty points system
+- **Promotion Management**: Discount codes, promotion campaigns
+- **Reporting & Analytics**: 
+  - Sales & Inventory Reports
+  - Customer Analytics
+  - Promotion Analytics
+- **User & System**: User management, roles & permissions, audit logs
+
+### Sales Dashboard
+- Quick order creation with barcode scanning
+- Customer lookup and management
+- Real-time inventory checking
+- Performance tracking
+- Draft orders management
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React** 18+ with Vite
+- **React Router** for navigation
+- **Axios** for API calls
+- **Chart.js** & **react-chartjs-2** for data visualization
+- **Lucide React** for icons
+- **CSS** for styling
+
+### Backend
+- **PHP** 8.0+
+- **MySQL** database
+- **PDO** for database operations
+- Session-based authentication
+
+## 📦 Installation
+
+### Prerequisites
+- **XAMPP** (or similar: Apache + MySQL + PHP 8.0+)
+- **Node.js** 16+ and npm
+- **Git**
+
+### Backend Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/Final-ERP.git
+   cd Final-ERP
+   ```
+
+2. **Move to XAMPP htdocs**
+   ```bash
+   # Copy the entire project to C:\xampp\htdocs\
+   ```
+
+3. **Database Configuration**
+   ```bash
+   # Copy the example config file
+   cp includes/db.php.example includes/db.php
+   
+   # Edit includes/db.php with your database credentials
+   ```
+
+4. **Import Database**
+   - Open phpMyAdmin (http://localhost/phpmyadmin)
+   - Create a new database (e.g., `final_erp`)
+   - Import the SQL file from `database/schema.sql` (if provided)
+   - Or run the migration scripts
+
+5. **Start Apache and MySQL**
+   - Open XAMPP Control Panel
+   - Start Apache and MySQL services
+
+### Frontend Setup
+
+1. **Navigate to frontend directory**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure API endpoint** (if needed)
+   - Check `frontend/src/api/axios.js`
+   - Update `baseURL` if your backend is on a different port
+
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8081/Final-ERP/api
+
+## 👤 Default Login Credentials
+
+### Admin Account
+- **Username**: `admin`
+- **Password**: `admin123`
+
+### Sales Account
+- **Username**: `huysale`
+- **Password**: `123456`
+
+## 📁 Project Structure
 
 ```
 Final-ERP/
-├── api/               # PHP Backend API (RESTful)
-│   ├── admin/         # Admin endpoints (Products, Stats)
-│   ├── sale/          # Sales Staff endpoints (Stock, Orders)
-│   └── ...            # Public endpoints (Auth, Products)
-├── frontend/          # React Vite Application
+├── api/                    # Backend API endpoints
+│   ├── admin/             # Admin-specific endpoints
+│   ├── auth/              # Authentication endpoints
+│   └── customer/          # Customer-facing endpoints
+├── frontend/              # React frontend
 │   ├── src/
-│   │   ├── components/# Reusable UI components
-│   │   ├── context/   # Auth & Language Context
-│   │   ├── pages/     # Application Pages
-│   │   └── ...
-├── includes/          # Shared PHP Utilities (DB, Cache)
-├── uploads/           # Product component images
-└── erpiiiii.sql       # Consolidated Database Schema
+│   │   ├── components/    # Reusable components
+│   │   ├── pages/         # Page components
+│   │   ├── context/       # React context providers
+│   │   ├── hooks/         # Custom hooks
+│   │   └── api/           # API configuration
+│   └── public/            # Static assets
+├── includes/              # PHP includes
+│   ├── db.php            # Database connection (gitignored)
+│   └── api_header.php    # API headers
+└── database/             # Database files
+    └── schema.sql        # Database schema
 ```
 
-## 🚀 Tech Stack
+## 🔒 Security Notes
 
--   **Frontend**: React.js, Vite, Axios, React Router, Tailwind CSS (or Custom CSS).
--   **Backend**: Native PHP 8.x, PDO (MySQL Authentication).
--   **Database**: MySQL (MariaDB).
--   **Caching**: File-based Caching (Redis-free).
--   **Server**: XAMPP / Apache.
+- **Never commit** `includes/db.php` with real credentials
+- Change default passwords in production
+- Use environment variables for sensitive data
+- Enable HTTPS in production
+- Implement rate limiting for API endpoints
 
-## 🔑 Demo Accounts
+## 🚀 Deployment
 
-| Role | Username | Password | Access |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin` | `123456` | `/admin` - Dashboard, Products, Orders |
-| **Sales** | `saleuser` | `123456` | `/sale` - Stock Lookup, Manual Orders |
-| **Customer** | `customer_test` | `123456` | `/` - Home, Cart, Checkout |
-
-## 🛠️ Installation & Setup
-
-### 1. Prerequisites
--   **XAMPP** (PHP 8.0+, MySQL/MariaDB)
--   **Node.js** (v18+)
-
-### 2. Backend Setup
-1.  Clone the repository into `c:\xampp\htdocs\Final-ERP`.
-    ```bash
-    git clone https://github.com/thanhuy8888/Final-ERP.git .
-    ```
-2.  Start **Apache** and **MySQL** in XAMPP Control Panel.
-3.  Open [phpMyAdmin](http://localhost/phpmyadmin/).
-4.  Create a new database named `final_erp`.
-    *(Or simply import the file below which handles creation)*
-5.  Import `erpiiiii.sql` into the database.
-6.  Verify `includes/db.php` credentials:
-    ```php
-    $host = 'localhost';
-    $db   = 'final_erp';
-    $user = 'root';
-    $pass = ''; // Default XAMPP password is empty
-    ```
-
-### 3. Frontend Setup
-1.  Navigate to the frontend folder:
-    ```bash
-    cd frontend
-    ```
-2.  (Optional) Install dependencies (node_modules is already included):
-    ```bash
-    npm install
-    ```
-3.  Start the development server:
-    ```bash
-    npm run dev
-    ```
-
-### 4. Access the Application
--   **Frontend**: [http://localhost:5173](http://localhost:5173)
--   **Backend API**: [http://localhost/Final-ERP/api](http://localhost/Final-ERP/api)
-
-## 📋 Features Checklist
-### Customer Portal
--   [x] Account Registration/Login
--   [x] Product Browsing & Search (Filter by Category, Price)
--   [x] Shopping Cart & Checkout (COD)
--   [x] Order History
-
-### Sales Staff Portal
--   [x] Stock Lookup (Real-time Inventory)
--   [x] Manual Order Creation (Walk-in Customers)
--   [x] Returns & Exchanges
-
-### Admin Portal
--   [x] Dashboard Analytics (Revenue, Top Products)
--   [x] Product Management (CRUD, Variants)
--   [x] Audit Logs
+### Production Checklist
+- [ ] Update database credentials
+- [ ] Change default admin password
+- [ ] Build frontend for production: `npm run build`
+- [ ] Configure proper CORS settings
+- [ ] Enable HTTPS
+- [ ] Set up database backups
+- [ ] Configure error logging
+- [ ] Optimize images and assets
 
 ## 📝 License
+
 This project is for educational purposes.
+
+## 👨‍💻 Author
+
+Your Name - [GitHub Profile](https://github.com/yourusername)
+
+## 🙏 Acknowledgments
+
+- Built as a final project for [Course Name]
+- Special thanks to [Instructor/Team]

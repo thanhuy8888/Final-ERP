@@ -18,7 +18,8 @@ try {
     
     $query = "
         SELECT i.quantity_on_hand, s.store_name, p.name as product_name, p.sku, p.image, 
-               pv.size, pv.color, pv.variant_sku
+               pv.size, pv.color, pv.variant_sku, p.category_id,
+               p.id as product_id, i.variant_id
         FROM inventory i
         JOIN products p ON i.product_id = p.id
         LEFT JOIN product_variants pv ON i.variant_id = pv.variant_id
@@ -34,6 +35,24 @@ try {
         $params[] = $term;
         $params[] = $term;
         $params[] = $term;
+    }
+
+    // Filter by specific product/variant for multi-store lookup
+    if (isset($_GET['product_id'])) {
+        $query .= " AND p.id = ?";
+        $params[] = $_GET['product_id'];
+    }
+    
+    // exact variant match (handle NULL for products without variants if needed, 
+    // but usually 0 or specific ID is passed)
+    if (isset($_GET['variant_id'])) {
+        $vid = $_GET['variant_id'];
+        if ($vid == 0 || $vid == 'null') {
+             $query .= " AND (i.variant_id IS NULL OR i.variant_id = 0)";
+        } else {
+             $query .= " AND i.variant_id = ?";
+             $params[] = $vid;
+        }
     }
     
     $query .= " ORDER BY p.name, pv.size, pv.color, s.store_name LIMIT 50";

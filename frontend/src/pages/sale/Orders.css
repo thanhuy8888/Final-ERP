@@ -17,16 +17,18 @@
 
 .btn-new-order {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    background: #E31E24;
     color: white;
     text-decoration: none;
     border-radius: 8px;
     font-weight: 600;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(227, 30, 36, 0.3);
 }
 
 .btn-new-order:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.4);
 }
 
 .orders-filters {
@@ -55,8 +57,9 @@
 }
 
 .orders-filters button.active {
-    background: #3498db;
+    background: #E31E24;
     color: white;
+    box-shadow: 0 2px 6px rgba(227, 30, 36, 0.3);
 }
 
 .no-orders {
@@ -112,7 +115,7 @@
 
 .amount {
     font-weight: 600;
-    color: #e74c3c;
+    color: #E31E24;
 }
 
 .status-select {
@@ -124,6 +127,7 @@
     background: white;
 }
 
+/* Status colors - kept for functionality */
 .status-select.pending {
     border-color: #f39c12;
     color: #f39c12;
@@ -150,19 +154,36 @@
 }
 
 .status-select.cancelled {
-    border-color: #e74c3c;
-    color: #e74c3c;
+    border-color: #E31E24;
+    color: #E31E24;
 }
 
-.btn-view {
-    padding: 6px 12px;
-    background: #3498db;
-    color: white;
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-view,
+.btn-reorder {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #ddd;
     text-decoration: none;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 16px;
+    transition: all 0.2s;
 }
 
 .btn-view:hover {
-    background: #2980b9;
+    border-color: #3498db;
+    background: #f0f7fa;
+}
+
+.btn-reorder:hover {
+    border-color: #27ae60;
+    background: #f0f9f4;
 }

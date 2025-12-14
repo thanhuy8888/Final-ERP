@@ -202,10 +202,13 @@ try {
             $discount = floatval($data['discount'] ?? 0);
             $finalAmount = $totalAmount - $discount;
             
+            // Get payment method (default to cash)
+            $paymentMethod = $data['payment_method'] ?? 'cash';
+            
             // Create order
             $stmt = $pdo->prepare("
-                INSERT INTO orders (user_id, sale_id, customer_id, total_amount, discount_amount, status, notes, shipping_address) 
-                VALUES (?, ?, ?, ?, ?, 'confirmed', ?, ?)
+                INSERT INTO orders (user_id, sale_id, customer_id, total_amount, discount_amount, status, payment_method, notes, shipping_address) 
+                VALUES (?, ?, ?, ?, ?, 'confirmed', ?, ?, ?)
             ");
             
             // Use a placeholder user_id if customer doesn't have an account
@@ -215,43 +218,150 @@ try {
                 $customerId,
                 $finalAmount,
                 $discount,
+                $paymentMethod,
                 $data['notes'] ?? null,
                 $data['address'] ?? null
             ]);
             
             $orderId = $pdo->lastInsertId();
             
-            // Create order items
+            // Insert order items
             $stmt = $pdo->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+            $deductStmt = $pdo->prepare("UPDATE inventory SET quantity_on_hand = quantity_on_hand - ? WHERE product_id = ? AND store_id = (SELECT store_id FROM users WHERE id = ?) AND quantity_on_hand >= ?");
+            
+            // Fallback: If no store assigned to user, decrement from 'main' store or random available?
+            // BETTER APPROACH: Decrement from a specific store. 
+            // Assumption: Salesperson belongs to a store. We need to get `store_id` from user session or `users` table.
+            
+            // Get user's store_id
+            $storeStmt = $pdo->prepare("SELECT store_id FROM users WHERE id = ?");
+            $storeStmt->execute([$saleId]);
+            $userStore = $storeStmt->fetch();
+            $storeId = $userStore['store_id'] ?? 1; // Default to store 1 if not set
+
             foreach ($orderItems as $item) {
+                // 1. Insert Item
                 $stmt->execute([$orderId, $item['product_id'], $item['quantity'], $item['price']]);
+                
+                // 2. Deduct Inventory
+                // We try to deduct from the specific store. 
+                // Note: Simple deduction. Production logic should handle "insufficient stock" checks before transaction.
+                $deductSql = "UPDATE inventory SET quantity_on_hand = quantity_on_hand - ? WHERE product_id = ? AND store_id = ?";
+                $pdo->prepare($deductSql)->execute([$item['quantity'], $item['product_id'], $storeId]);
             }
+            
+            // ===== LOYALTY SYSTEM: Award Points =====
+            if ($customerId) {
+                // Calculate points earned (1 point per 1000 VND)
+                $pointsEarned = floor($finalAmount / 1000);
+                
+                // Get customer's current tier for points multiplier
+                $stmt = $pdo->prepare("SELECT membership_tier FROM customers WHERE id = ?");
+                $stmt->execute([$customerId]);
+                $customer = $stmt->fetch();
+                
+                // Apply tier multiplier
+                $multiplier = 1.0;
+                switch ($customer['membership_tier'] ?? 'bronze') {
+                    case 'silver': $multiplier = 1.2; break;
+                    case 'gold': $multiplier = 1.5; break;
+                    case 'platinum': $multiplier = 2.0; break;
+                }
+                $pointsEarned = floor($pointsEarned * $multiplier);
+                
+                // Update customer loyalty points and lifetime spending
+                $stmt = $pdo->prepare("
+                    UPDATE customers 
+                    SET loyalty_points = loyalty_points + ?,
+                        total_lifetime_spent = total_lifetime_spent + ?
+                    WHERE id = ?
+                ");
+                $stmt->execute([$pointsEarned, $finalAmount, $customerId]);
+                
+                // Log loyalty transaction
+                $stmt = $pdo->prepare("
+                    INSERT INTO loyalty_transactions (customer_id, order_id, points_earned, transaction_type, description)
+                    VALUES (?, ?, ?, 'earn', ?)
+                ");
+                $stmt->execute([
+                    $customerId, 
+                    $orderId, 
+                    $pointsEarned,
+                    "Earned $pointsEarned points from order #$orderId"
+                ]);
+                
+                // Check and upgrade tier if needed
+                $stmt = $pdo->prepare("SELECT total_lifetime_spent FROM customers WHERE id = ?");
+                $stmt->execute([$customerId]);
+                $customer = $stmt->fetch();
+                $totalSpent = $customer['total_lifetime_spent'];
+                
+                $newTier = 'bronze';
+                if ($totalSpent >= 50000000) $newTier = 'platinum';
+                elseif ($totalSpent >= 20000000) $newTier = 'gold';
+                elseif ($totalSpent >= 5000000) $newTier = 'silver';
+                
+                // Update tier if changed
+                $stmt = $pdo->prepare("
+                    UPDATE customers 
+                    SET membership_tier = ?, tier_updated_at = CURRENT_TIMESTAMP 
+                    WHERE id = ? AND membership_tier != ?
+                ");
+                $stmt->execute([$newTier, $customerId, $newTier]);
+            }
+            // ===== END LOYALTY SYSTEM =====
             
             $pdo->commit();
             
+            // Clear product cache to reflect stock changes
+            try {
+                // Assuming FileCache is available via includes/file_cache.php which we need to require if not already
+                // But orders.php didn't require it at top. Let's add require at top or here safely.
+                // It is safer to add require_once at top, but for minimal diff we can do:
+                $cacheFile = __DIR__ . '/../../includes/file_cache.php';
+                if (file_exists($cacheFile)) {
+                    require_once $cacheFile;
+                    // $cache instance is created in file_cache.php
+                    if (isset($cache)) {
+                        $cache->deletePattern('products_*');
+                        // Also clear specific product caches if we want to be thorough, but products_* covers the list
+                        foreach ($orderItems as $item) {
+                            $cache->delete('product_' . $item['product_id']);
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                // Ignore cache errors
+            }
+
             // Send confirmation email
             if ($customerEmail) {
                 try {
                     $emailService = new EmailService($language);
                     $emailService->sendOrderConfirmation($orderId, $customerEmail, $customerName);
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     error_log("Email failed: " . $e->getMessage());
                 }
             }
+            
+            // Clean buffer to remove any warnings or whitespace
+            if (ob_get_length()) ob_clean();
             
             echo json_encode([
                 'success' => true,
                 'message' => 'Order created successfully',
                 'order_id' => $orderId,
                 'total_amount' => $finalAmount
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
     }
-} catch (PDOException $e) {
+} catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
+    
+    if (ob_get_length()) ob_clean();
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }
 ?>

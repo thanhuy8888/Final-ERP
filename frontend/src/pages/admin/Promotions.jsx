@@ -1,29 +1,26 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useTranslation } from '../../hooks/useTranslation';
+import { Trash, Edit, Plus, Calendar, Tag, AlertTriangle } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext';
+import PromotionModal from '../../components/modals/PromotionModal';
+import './Orders.css';
 
 const AdminPromotions = () => {
     const { t } = useTranslation();
+    const { success, error: showError } = useToast();
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [editingPromo, setEditingPromo] = useState(null);
-    const [formData, setFormData] = useState({
-        promotion_code: '',
-        promotion_name: '',
-        description: '',
-        discount_type: 'Percentage',
-        discount_value: '',
-        min_purchase_amount: 0,
-        max_discount_amount: '',
-        start_date: '',
-        end_date: '',
-        usage_limit: '',
-        is_active: true
-    });
-    const [message, setMessage] = useState({ type: '', text: '' });
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPromo, setSelectedPromo] = useState(null);
+
+    // Delete State
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
 
     const fetchPromotions = async () => {
+        setLoading(true);
         try {
             const response = await api.get('/admin/promotions.php');
             setPromotions(response.data);
@@ -38,261 +35,153 @@ const AdminPromotions = () => {
         fetchPromotions();
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const payload = editingPromo ? { ...formData, promotion_id: editingPromo.promotion_id } : formData;
-            const response = await api.post('/admin/promotions.php', payload);
-            if (response.data.success) {
-                setMessage({ type: 'success', text: response.data.message });
-                setShowForm(false);
-                setEditingPromo(null);
-                resetForm();
-                fetchPromotions();
-            }
-        } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Error' });
-        }
-    };
-
     const handleEdit = (promo) => {
-        setEditingPromo(promo);
-        setFormData({
-            promotion_code: promo.promotion_code,
-            promotion_name: promo.promotion_name,
-            description: promo.description || '',
-            discount_type: promo.discount_type,
-            discount_value: promo.discount_value,
-            min_purchase_amount: promo.min_purchase_amount || 0,
-            max_discount_amount: promo.max_discount_amount || '',
-            start_date: promo.start_date?.slice(0, 16) || '',
-            end_date: promo.end_date?.slice(0, 16) || '',
-            usage_limit: promo.usage_limit || '',
-            is_active: promo.is_active
-        });
-        setShowForm(true);
+        setSelectedPromo(promo);
+        setIsModalOpen(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm(t('common.delete') + '?')) return;
+    const handleCreate = () => {
+        setSelectedPromo(null);
+        setIsModalOpen(true);
+    };
+
+    const handleDeleteClick = (id) => {
+        setDeleteModal({ open: true, id });
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteModal.id) return;
         try {
-            await api.delete('/admin/promotions.php', { data: { promotion_id: id } });
+            await api.delete('/admin/promotions.php', { data: { promotion_id: deleteModal.id } });
             fetchPromotions();
+            setDeleteModal({ open: false, id: null });
+            success('Promotion deleted');
         } catch (error) {
-            setMessage({ type: 'error', text: 'Delete failed' });
+            showError('Delete failed');
         }
-    };
-
-    const resetForm = () => {
-        const now = new Date();
-        const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-        setFormData({
-            promotion_code: '',
-            promotion_name: '',
-            description: '',
-            discount_type: 'Percentage',
-            discount_value: '',
-            min_purchase_amount: 0,
-            max_discount_amount: '',
-            start_date: now.toISOString().slice(0, 16),
-            end_date: nextMonth.toISOString().slice(0, 16),
-            usage_limit: '',
-            is_active: true
-        });
     };
 
     const getStatusBadge = (promo) => {
-        const now = new Date();
-        const start = new Date(promo.start_date);
-        const end = new Date(promo.end_date);
-
-        if (!promo.is_active) {
-            return <span style={{ background: '#95a5a6', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>Disabled</span>;
-        }
-        if (now < start) {
-            return <span style={{ background: '#f39c12', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>{t('admin.promoStatus.upcoming')}</span>;
-        }
-        if (now > end) {
-            return <span style={{ background: '#e74c3c', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>{t('admin.promoStatus.expired')}</span>;
-        }
-        return <span style={{ background: '#2ecc71', color: 'white', padding: '3px 8px', borderRadius: '12px', fontSize: '12px' }}>{t('admin.promoStatus.active')}</span>;
+        const status = promo.status || 'draft';
+        const styles = {
+            draft: { bg: '#f1f5f9', color: '#64748b' },
+            active: { bg: '#dcfce7', color: '#166534' },
+            expired: { bg: '#fee2e2', color: '#991b1b' }
+        };
+        const s = styles[status] || styles['draft'];
+        return (
+            <span style={{
+                background: s.bg, color: s.color,
+                padding: '4px 10px', borderRadius: '20px',
+                fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase'
+            }}>
+                {status}
+            </span>
+        );
     };
 
-    if (loading) return <div>{t('common.loading')}</div>;
-
     return (
-        <div>
-            <div className="admin-header">
-                <h1>{t('admin.promoList')}</h1>
-                <button className="btn-primary" onClick={() => {
-                    setShowForm(true);
-                    setEditingPromo(null);
-                    resetForm();
-                }}>+ {t('admin.addPromo')}</button>
+        <div className="admin-page-container">
+            <div className="admin-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#0f172a', marginBottom: '4px' }}>Promotion Management</h1>
+                    <p className="text-muted" style={{ fontSize: '0.9rem' }}>Manage discounts, coupons, and special offers.</p>
+                </div>
+                <button
+                    className="btn-modern primary"
+                    onClick={handleCreate}
+                    style={{ backgroundColor: '#dc2626', borderColor: '#dc2626' }}
+                >
+                    <Plus size={16} /> New Promotion
+                </button>
             </div>
 
-            {message.text && (
-                <div style={{
-                    padding: '10px 15px',
-                    marginBottom: '15px',
-                    borderRadius: '5px',
-                    background: message.type === 'success' ? '#d4edda' : '#f8d7da',
-                    color: message.type === 'success' ? '#155724' : '#721c24'
-                }}>
-                    {message.text}
-                </div>
-            )}
-
-            {showForm && (
-                <div className="admin-card" style={{ marginBottom: '20px' }}>
-                    <h3>{editingPromo ? t('common.edit') : t('admin.addPromo')}</h3>
-                    <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                            <div>
-                                <label>{t('admin.promoCode')} *</label>
-                                <input
-                                    type="text"
-                                    value={formData.promotion_code}
-                                    onChange={(e) => setFormData({ ...formData, promotion_code: e.target.value.toUpperCase() })}
-                                    required
-                                    placeholder="SALE20, NEWYEAR"
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>Name *</label>
-                                <input
-                                    type="text"
-                                    value={formData.promotion_name}
-                                    onChange={(e) => setFormData({ ...formData, promotion_name: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>{t('admin.discountType')} *</label>
-                                <select
-                                    value={formData.discount_type}
-                                    onChange={(e) => setFormData({ ...formData, discount_type: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                >
-                                    <option value="Percentage">{t('admin.percent')} (%)</option>
-                                    <option value="Fixed Amount">{t('admin.fixed')} (VND)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>{t('admin.discount')} *</label>
-                                <input
-                                    type="number"
-                                    value={formData.discount_value}
-                                    onChange={(e) => setFormData({ ...formData, discount_value: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>{t('admin.minOrder')}</label>
-                                <input
-                                    type="number"
-                                    value={formData.min_purchase_amount}
-                                    onChange={(e) => setFormData({ ...formData, min_purchase_amount: e.target.value })}
-                                    placeholder="0"
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>Max Discount</label>
-                                <input
-                                    type="number"
-                                    value={formData.max_discount_amount}
-                                    onChange={(e) => setFormData({ ...formData, max_discount_amount: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>{t('admin.startDate')} *</label>
-                                <input
-                                    type="datetime-local"
-                                    value={formData.start_date}
-                                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div>
-                                <label>{t('admin.endDate')} *</label>
-                                <input
-                                    type="datetime-local"
-                                    value={formData.end_date}
-                                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                                    required
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                            <div style={{ gridColumn: 'span 2' }}>
-                                <label>{t('admin.description')}</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    rows="2"
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-                            </div>
-                        </div>
-                        <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-                            <button type="submit" className="btn-primary">
-                                {editingPromo ? t('common.save') : t('common.add')}
-                            </button>
-                            <button type="button" onClick={() => setShowForm(false)} style={{
-                                padding: '10px 20px',
-                                border: '1px solid #ddd',
-                                borderRadius: '5px',
-                                background: 'white',
-                                cursor: 'pointer'
-                            }}>{t('common.cancel')}</button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className="admin-card">
-                <table className="admin-table">
+            <div className="content-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <table className="table-modern">
                     <thead>
                         <tr>
-                            <th>{t('admin.promoCode')}</th>
+                            <th>Code</th>
                             <th>Name</th>
-                            <th>{t('admin.discount')}</th>
-                            <th>{t('admin.minOrder')}</th>
-                            <th>Duration</th>
-                            <th>{t('admin.status')}</th>
-                            <th>{t('admin.actions')}</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Validity</th>
+                            <th>Status</th>
+                            <th style={{ textAlign: 'right' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {promotions.map(promo => (
                             <tr key={promo.promotion_id}>
-                                <td><strong>{promo.promotion_code}</strong></td>
-                                <td>{promo.promotion_name}</td>
                                 <td>
-                                    {promo.discount_type === 'Percentage'
-                                        ? `${promo.discount_value}%`
-                                        : `${parseInt(promo.discount_value).toLocaleString()}${t('common.currency')}`}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Tag size={14} color="#dc2626" />
+                                        <span style={{ fontWeight: 600, color: '#0f172a' }}>{promo.promotion_code}</span>
+                                    </div>
                                 </td>
-                                <td>{parseInt(promo.min_purchase_amount).toLocaleString()}{t('common.currency')}</td>
-                                <td style={{ fontSize: '12px' }}>
-                                    {new Date(promo.start_date).toLocaleDateString('vi-VN')}<br />
-                                    → {new Date(promo.end_date).toLocaleDateString('vi-VN')}
+                                <td>{promo.promotion_name}</td>
+                                <td style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                                    {promo.discount_type === 'BuyXGetY' ? 'Buy X Get Y' : promo.discount_type}
+                                </td>
+                                <td style={{ fontWeight: 700, color: '#dc2626' }}>
+                                    {promo.discount_type === 'Percentage' ? `-${promo.discount_value}%` :
+                                        promo.discount_type === 'BuyXGetY' ? `Buy ${promo.buy_x} Get ${promo.get_y}` :
+                                            `-${parseInt(promo.discount_value).toLocaleString()}₫`}
+                                </td>
+                                <td style={{ fontSize: '0.8rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <Calendar size={12} />
+                                        {new Date(promo.start_date).toLocaleDateString('vi-VN')} - {new Date(promo.end_date).toLocaleDateString('vi-VN')}
+                                    </div>
                                 </td>
                                 <td>{getStatusBadge(promo)}</td>
-                                <td>
-                                    <button onClick={() => handleEdit(promo)} className="btn-edit">✏️</button>
-                                    <button onClick={() => handleDelete(promo.promotion_id)} className="btn-danger">🗑️</button>
+                                <td style={{ textAlign: 'right' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                                        <button className="btn-view-modern" onClick={() => handleEdit(promo)}>
+                                            <Edit size={14} />
+                                        </button>
+                                        <button className="btn-view-modern" style={{ color: '#ef4444', borderColor: '#fee2e2', background: '#fef2f2' }} onClick={() => handleDeleteClick(promo.promotion_id)}>
+                                            <Trash size={14} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
+                        {promotions.length === 0 && !loading && (
+                            <tr>
+                                <td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                                    No promotions found. Create one to get started!
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
+
+            <PromotionModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                promotion={selectedPromo}
+                onSuccess={fetchPromotions}
+            />
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ maxWidth: '400px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', color: '#dc2626' }}>
+                            <div style={{ background: '#FEE2E2', padding: '12px', borderRadius: '50%' }}>
+                                <AlertTriangle size={32} />
+                            </div>
+                        </div>
+                        <h3 style={{ marginBottom: '10px' }}>Delete Promotion?</h3>
+                        <p style={{ color: '#64748b', marginBottom: '20px' }}>Are you sure you want to delete this promotion? This action cannot be undone.</p>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                            <button className="btn-modern secondary" onClick={() => setDeleteModal({ open: false, id: null })}>Cancel</button>
+                            <button className="btn-modern primary" style={{ backgroundColor: '#dc2626', borderColor: '#dc2626' }} onClick={confirmDelete}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
