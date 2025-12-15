@@ -107,10 +107,14 @@ A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend
 
 ### Admin Account
 - **Username**: `admin`
-- **Password**: `admin123`
+- **Password**: `123456`
 
 ### Sales Account
-- **Username**: `huysale`
+- **Username**: `saleuser`
+- **Password**: `123456`
+
+### Customer Account
+- **Username**: `customer_test`
 - **Password**: `123456`
 
 ## 📁 Project Structure
