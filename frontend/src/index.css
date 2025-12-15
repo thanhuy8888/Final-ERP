@@ -83,7 +83,8 @@ select:focus {
   border-radius: 4px;
 }
 
-background: #C41C20;
+::-webkit-scrollbar-thumb:hover {
+  background: #C41C20;
 }
 
 /* Button Styles */
