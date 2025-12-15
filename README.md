@@ -91,9 +91,17 @@ A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend
    npm install
    ```
 
-3. **Configure API endpoint** (if needed)
-   - Check `frontend/src/api/axios.js`
-   - Update `baseURL` if your backend is on a different port
+3. **Configure API endpoint** (Optional - only if Apache uses different port)
+   ```bash
+   # If your Apache runs on port other than 8081:
+   # 1. Copy .env.example to .env
+   cp .env.example .env
+   
+   # 2. Edit .env and change the port
+   # VITE_API_URL=http://localhost:YOUR_PORT/Final-ERP/api
+   ```
+   
+   > **Note:** Default is port 8081. Skip this step if using XAMPP defaults.
 
 4. **Start development server**
    ```bash

@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// Backend API URL - configurable via .env file
+// Default: http://localhost:8081/Final-ERP/api
+// To change: Copy .env.example to .env and update VITE_API_URL
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8081/Final-ERP/api';
+
 const api = axios.create({
-    baseURL: 'http://localhost:8081/Final-ERP/api', // Fixed path to match filesystem
+    baseURL: baseURL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
