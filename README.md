@@ -75,9 +75,40 @@ A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend
      - `$username = 'root'`
      - `$password = ''`
 
-5. **Start Apache and MySQL**
+5. **Configure Apache Port (IMPORTANT!)**
+   
+   > **⚠️ Critical:** Apache MUST run on port **8081** for the system to work!
+   
+   **Check your current port:**
    - Open XAMPP Control Panel
-   - Start Apache and MySQL services
+   - Look at the "Port(s)" column next to Apache
+   - Should show: `8081, 443` or `80, 443`
+   
+   **If Apache is NOT on port 8081:**
+   
+   a. **Stop Apache** (if running)
+   
+   b. **Change port to 8081:**
+   ```
+   1. Click "Config" button next to Apache
+   2. Select "httpd.conf"
+   3. Find line: Listen 80
+   4. Change to: Listen 8081
+   5. Save and close
+   ```
+   
+   c. **Start Apache and MySQL**
+   - Click "Start" for both Apache and MySQL
+   - Apache Port(s) should now show: `8081, 443`
+   
+   **If port 8081 is already in use:**
+   ```powershell
+   # Check what's using port 8081
+   netstat -ano | findstr :8081
+   
+   # Kill the process (replace PID with actual number)
+   taskkill /PID [PID] /F
+   ```
 
 ### Frontend Setup
 
@@ -91,26 +122,43 @@ A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend
    npm install
    ```
 
-3. **Configure API endpoint** (Optional - only if Apache uses different port)
+3. **Configure API endpoint** (Only if you CANNOT use port 8081)
+   
+   > **⚠️ Recommended:** Change Apache to port 8081 instead of using .env
+   
+   If you absolutely cannot use port 8081:
    ```bash
-   # If your Apache runs on port other than 8081:
    # 1. Copy .env.example to .env
    cp .env.example .env
    
    # 2. Edit .env and change the port
-   # VITE_API_URL=http://localhost:YOUR_PORT/Final-ERP/api
+   # For port 80: VITE_API_URL=http://localhost/Final-ERP/api
+   # For port 8080: VITE_API_URL=http://localhost:8080/Final-ERP/api
    ```
    
-   > **Note:** Default is port 8081. Skip this step if using XAMPP defaults.
+   > **Note:** Default is port 8081. Skip this step if Apache is on 8081.
 
 4. **Start development server**
    ```bash
    npm run dev
    ```
 
-5. **Access the application**
+5. **Verify ports and access application**
+   
+   **Check Vite dev server port:**
+   - Terminal should show: `Local: http://localhost:5173/`
+   - If different port (5174, 5175, etc.) → Another Vite instance is running
+   - Fix: Close all terminals and run `npm run dev` again
+   
+   **Access URLs:**
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8081/Final-ERP/api
+   
+   **Test backend is working:**
+   ```
+   Open browser: http://localhost:8081/Final-ERP/api/check_auth.php
+   Should see: {"authenticated":false}
+   ```
 
 ## 👤 Default Login Credentials
 
