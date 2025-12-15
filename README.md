@@ -60,19 +60,20 @@ A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend
    # Copy the entire project to C:\xampp\htdocs\
    ```
 
-3. **Database Configuration**
-   ```bash
-   # Copy the example config file
-   cp includes/db.php.example includes/db.php
-   
-   # Edit includes/db.php with your database credentials
-   ```
-
-4. **Import Database**
+3. **Database Setup**
    - Open phpMyAdmin (http://localhost/phpmyadmin)
-   - Create a new database (e.g., `final_erp`)
-   - Import the SQL file from `database/schema.sql` (if provided)
-   - Or run the migration scripts
+   - Click "Import" tab
+   - Choose file `final_erp.sql`
+   - Click "Go"
+   
+   > **Note:** Database `final_erp` will be created automatically!
+
+4. **Verify Database Connection**
+   - File `includes/db.php` is already configured with XAMPP defaults
+   - If you use different settings, edit this file:
+     - `$dbname = 'final_erp'`
+     - `$username = 'root'`
+     - `$password = ''`
 
 5. **Start Apache and MySQL**
    - Open XAMPP Control Panel
@@ -107,10 +108,14 @@ A comprehensive Enterprise Resource Planning (ERP) system built with PHP backend
 
 ### Admin Account
 - **Username**: `admin`
-- **Password**: `admin123`
+- **Password**: `123456`
 
 ### Sales Account
-- **Username**: `huysale`
+- **Username**: `saleuser`
+- **Password**: `123456`
+
+### Customer Account
+- **Username**: `customer_test`
 - **Password**: `123456`
 
 ## 📁 Project Structure

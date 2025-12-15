@@ -7,8 +7,8 @@ vendor/
 .env.local
 .env.production
 
-# Database config (IMPORTANT - don't push credentials!)
-includes/db.php
+# Database config - Shared for educational project
+# includes/db.php  # Uncomment this line for production!
 
 # IDE
 .vscode/

@@ -18,6 +18,18 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
+-- Create database if not exists
+--
+CREATE DATABASE IF NOT EXISTS `final_erp` 
+DEFAULT CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+--
+-- Use the database
+--
+USE `final_erp`;
+
+--
 -- Cơ sở dữ liệu: `final_erp`
 --
 
@@ -806,8 +818,8 @@ INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `phone`
 (1, 'admin', '$2y$10$V7xmVxpWyNUuDGhU8Kb1CecgcjM7zfseJ3I5GlCp/9Kcqt3x1lvwS', 'Nguyễn Tổng', 'admin@example.com', NULL, 'admin', 1, '2025-12-12 20:59:25', '2025-12-13 09:43:06', 1),
 (2, 'saleuser', '$2y$10$ZVpVjCzIEIP22CZ2.MV.k.aL9ALMae6mnDufsR2HrbA9PqRh5Uzf.', 'Ngọc Anh Sale', 'sale@example.com', NULL, 'sale', 1, '2025-12-12 20:59:25', '2025-12-13 09:44:26', 1),
 (3, 'customer_test', '$2y$10$V7xmVxpWyNUuDGhU8Kb1CecgcjM7zfseJ3I5GlCp/9Kcqt3x1lvwS', 'Mạc Long', 'customer@example.com', NULL, 'customer', 1, '2025-12-12 20:59:25', '2025-12-13 09:43:06', 1),
-(4, 'huysale', '$2y$10$ZVpVjCzIEIP22CZ2.MV.k.aL9ALMae6mnDufsR2HrbA...', 'Huy Sales', 'huy@canifa.com', NULL, 'sale', 1, '2025-12-15 01:37:54', '2025-12-15 01:37:54', 1),
-(5, 'tramsale', '$2y$10$ZVpVjCzIEIP22CZ2.MV.k.aL9ALMae6mnDufsR2HrbA...', 'Tram Sales', 'tram@canifa.com', NULL, 'sale', 1, '2025-12-15 01:37:54', '2025-12-15 01:37:54', 1);
+(4, 'huysale', '$2y$10$ZVpVjCzIEIP22CZ2.MV.k.aL9ALMae6mnDufsR2HrbA9PqRh5Uzf.', 'Huy Sales', 'huy@canifa.com', NULL, 'sale', 1, '2025-12-15 01:37:54', '2025-12-15 01:37:54', 1),
+(5, 'tramsale', '$2y$10$ZVpVjCzIEIP22CZ2.MV.k.aL9ALMae6mnDufsR2HrbA9PqRh5Uzf.', 'Tram Sales', 'tram@canifa.com', NULL, 'sale', 1, '2025-12-15 01:37:54', '2025-12-15 01:37:54', 1);
 
 --
 -- Chỉ mục cho các bảng đã đổ

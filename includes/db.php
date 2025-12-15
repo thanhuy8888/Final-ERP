@@ -1,20 +1,17 @@
 <?php
-$host = 'localhost';
-$db   = 'final_erp';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+// Database Configuration for Final ERP System
+// Educational Project - XAMPP Default Settings
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+$host = 'localhost';           // Database host (XAMPP default)
+$dbname = 'final_erp';         // Database name (must match imported SQL)
+$username = 'root';            // XAMPP default username
+$password = '';                // XAMPP default password (empty)
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
 ?>
