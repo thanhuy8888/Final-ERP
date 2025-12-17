@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import api from '../api/axios';
-import { useTranslation } from '../hooks/useTranslation';
-import Navbar from '../components/Navbar';
+import api from '../../api/axios';
+import { useTranslation } from '../../hooks/useTranslation';
+import Navbar from '../../components/Navbar';
 import './ProductDetail.css';
 
 const ProductDetail = () => {

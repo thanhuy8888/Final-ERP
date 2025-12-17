@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import api from '../api/axios';
+import api from '../../api/axios';
 import { Link, useSearchParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { useTranslation } from '../hooks/useTranslation';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import { useTranslation } from '../../hooks/useTranslation';
 import './Home.css';
 
 const Home = () => {

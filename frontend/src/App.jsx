@@ -6,13 +6,13 @@ import './App.css';
 
 // Lazy load layouts
 // Lazy load customer pages
-const Home = lazy(() => import('./pages/Home'));
+const Home = lazy(() => import('./pages/customer/Home'));
 const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
-const ProductDetail = lazy(() => import('./pages/ProductDetail'));
-const Cart = lazy(() => import('./pages/Cart'));
-const Checkout = lazy(() => import('./pages/Checkout'));
-const Orders = lazy(() => import('./pages/Orders'));
+const Register = lazy(() => import('./pages/customer/Register'));
+const ProductDetail = lazy(() => import('./pages/customer/ProductDetail'));
+const Cart = lazy(() => import('./pages/customer/Cart'));
+const Checkout = lazy(() => import('./pages/customer/Checkout'));
+const Orders = lazy(() => import('./pages/customer/Orders'));
 
 // Lazy load admin pages
 const AdminLayout = lazy(() => import('./components/AdminLayout'));

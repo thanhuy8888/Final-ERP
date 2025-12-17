@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import api from '../api/axios';
+import api from '../../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import { useTranslation } from '../hooks/useTranslation';
+import Navbar from '../../components/Navbar';
+import { useTranslation } from '../../hooks/useTranslation';
 import './Cart.css';
 
 const Cart = () => {
