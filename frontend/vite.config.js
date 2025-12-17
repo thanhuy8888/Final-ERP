@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/uploads': {
-        target: 'http://localhost:8081/Final-ERP',
+        target: 'http://localhost:80/Final-ERP',
         changeOrigin: true,
       },
     },
