@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary-red: #E31E24;
+    --primary-gradient: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    --bg-main: #F8FAFC;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --border-soft: #E2E8F0;
+    --text-navy: #1B2559;
+    --text-slate: #64748B;
+}
+
+/* Layout & Container */
+.product-form-container {
+    padding: 30px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.form-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto 35px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-left h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.form-bento-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 10px;
+}
+
+/* Cards & Bento Sections */
+.premium-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.premium-card .card-header-icon h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 10px;
+}
+
+.premium-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Input Styles */
+.input-group label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    background-color: #f9fafb;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.input-group textarea {
+    resize: vertical;
+}
+
+.input-group input:focus, 
+.input-group select:focus, 
+.input-group textarea:focus {
+    border-color: #E31E24;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.08);
+    background: white;
+    outline: none;
+}
+
+/* Price Highlight */
+.highlight-price input {
+    font-size: 22px;
+    font-weight: 800;
+    color: #E31E24;
+}
+
+.price-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-label {
+    position: absolute;
+    right: 20px;
+    font-weight: 800;
+    color: #94a3b8;
+}
+
+/* Image Preview */
+.image-preview-frame {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 2px dashed #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.image-preview-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.no-image-placeholder {
+    text-align: center;
+}
+
+.info-helper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* Buttons */
+.btn-save-gradient, .btn-cancel-glass {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-save-gradient:hover, .btn-cancel-glass:hover {
+    transform: translateY(-2px);
+}
+
+.btn-save-gradient {
+    background: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    color: white;
+}
+
+.btn-cancel-glass {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-bento-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+
+    .premium-card {
+        padding: 15px;
+    }
+}
+/* Tăng khoảng cách giữa các card */
+.premium-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.premium-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Cải thiện input */
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background-color: #f9fafb;
+    font-size: 14px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+/* Nút Save và Cancel */
+.btn-save-gradient {
+    background: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-save-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(227, 30, 36, 0.2);
+}
+
+.btn-cancel-glass {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.btn-cancel-glass:hover {
+    transform: translateY(-2px);
+}
+
+/* Cải thiện hình ảnh */
+.image-preview-frame {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 2px dashed #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.image-preview-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.no-image-placeholder {
+    text-align: center;
+}
+
+.info-helper {
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-bento-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+
+    .premium-card {
+        padding: 20px;
+    }
+}

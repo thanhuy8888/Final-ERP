@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+:root {
+    --primary: #E31E24;
+    --primary-light: rgba(227, 30, 36, 0.08);
+    --secondary: #1a1a2e;
+    --bg-body: #f4f7fe;
+    --card-bg: #ffffff;
+    --text-main: #1b2559;
+    --text-muted: #a3aed0;
+    --card-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+    --font-main: 'Plus Jakarta Sans', sans-serif;
+}
+
+.dashboard-container {
+    padding: 30px;
+    max-width: 1600px;
+    margin: 0 auto;
+    background-color: var(--bg-body);
+    font-family: var(--font-main);
+    color: var(--text-main);
+}
+
+/* Header Section */
+.dashboard-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.dashboard-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+    margin: 0;
+}
+
+.dashboard-header p {
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+/* Date Filter Pill */
+.date-filter {
+    display: flex;
+    background: #fff;
+    padding: 5px;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+}
+
+.date-filter button {
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.date-filter button.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0px 10px 20px rgba(227, 30, 36, 0.2);
+}
+
+/* KPI Grid */
+.stats-grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 20px;
+    border: none;
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    position: relative;
+}
+
+.stat-card .icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: var(--bg-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.stat-card h3 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.stat-change {
+    font-size: 0.8rem;
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.stat-change.positive { color: #05cd99; }
+.stat-change.negative { color: #ee5d50; }
+
+/* Charts Grid System */
+.charts-main-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.charts-secondary-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: var(--card-shadow);
+}
+
+.chart-card h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chart-container {
+    height: 380px;
+    width: 100%;
+    position: relative;
+}
+
+/* Loading Animation */
+.dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #e0e0e0;
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+@media (max-width: 1400px) {
+    .stats-grid-5 { grid-template-columns: repeat(3, 1fr); }
+    .charts-main-row, .charts-secondary-row { grid-template-columns: 1fr; }
+}

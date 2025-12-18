@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary-red: #E31E24;
+    --primary-gradient: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    --bg-main: #F4F7FE; /* Màu nền hơi xanh nhẹ sang trọng hơn */
+    --card-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+    --border-soft: #E0E5F2;
+    --text-main: #1B2559;
+    --text-muted: #A3AED0;
+}
+
+.product-form-container {
+    padding: 40px;
+    background-color: var(--bg-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+}
+
+/* Căn chỉnh lại lưới chính sang tỉ lệ 70/30 */
+.form-bento-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr; 
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Card thiết kế lại mượt hơn */
+.premium-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    border: none;
+    margin-bottom: 24px;
+}
+
+.card-header-icon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card-header-icon h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* Input Fields - Sạch sẽ và đồng nhất */
+.input-group label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    background-color: #fff;
+    font-size: 14px;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0px 10px 20px rgba(227, 30, 36, 0.1);
+    outline: none;
+}
+
+/* Price Box đặc biệt */
+.highlight-price {
+    background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+    border: 1px solid #fed7d7;
+}
+
+.highlight-price input {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary-red);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #feb2b2;
+    border-radius: 0;
+    padding: 10px 0;
+}
+
+/* Hình ảnh Preview vuông vức chuyên nghiệp */
+.image-preview-frame {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Luôn giữ khung hình vuông */
+    border-radius: 16px;
+    background: #F4F7FE;
+    border: 2px dashed var(--border-soft);
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+/* Buttons nâng cấp */
+.btn-save-gradient {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0px 10px 20px rgba(227, 30, 36, 0.2);
+}
+
+.btn-cancel-glass {
+    background: #fff;
+    border: 1px solid var(--border-soft);
+    color: var(--text-slate);
+    font-weight: 600;
+}

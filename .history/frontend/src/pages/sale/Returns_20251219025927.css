@@ -1,0 +1,256 @@
+/* 1. Căn giữa và giới hạn kích thước khung bao ngoài */
+.sale-returns {
+    padding: 30px;             /* Tăng khoảng cách lề trong một chút cho thoáng */
+    max-width: 1360px;         /* Kích thước chuẩn cho màn hình Laptop/PC hiện nay */
+    width: 100%;               /* Đảm bảo chiếm hết chiều rộng trên màn nhỏ hơn */
+    margin: 0 auto;            /* CĂN GIỮA: Tự động căn lề trái phải */
+    background-color: #f8f9fa; /* Màu nền nhẹ cho toàn trang */
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.returns-header {
+    margin-bottom: 24px;
+}
+
+.returns-header h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* 2. Điều chỉnh lại tỷ lệ chia cột */
+.returns-container {
+    display: grid;
+    /* CŨ: 1.5fr 1fr */
+    /* MỚI: 2.5fr 1fr -> Cột trái (Thao tác) chiếm 70%, Cột phải (Lịch sử) chiếm 30% */
+    /* Lý do: Bảng tìm kiếm đơn hàng cần nhiều chỗ hơn danh sách lịch sử */
+    grid-template-columns: 2.5fr 1fr; 
+    gap: 24px;
+    align-items: start; /* Căn các thẻ lên trên cùng */
+}
+
+
+.return-card {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+}
+
+.return-card h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    border-color: #E31E24;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.1);
+}
+
+.btn-search {
+    padding: 12px 24px;
+    background: #E31E24;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-search:hover {
+    background: #c0392b;
+}
+
+/* Table Styles */
+.return-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.return-table th {
+    background: #f8f9fa;
+    color: #7f8c8d;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 12px;
+    text-align: left;
+}
+
+.return-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.btn-select {
+    padding: 6px 12px;
+    background: white;
+    color: #E31E24;
+    border: 1px solid #E31E24;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+}
+
+.btn-select:hover {
+    background: #E31E24;
+    color: white;
+}
+
+/* Stepper Control */
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 4px;
+    border-radius: 20px;
+    width: fit-content;
+    border: 1px solid #eee;
+}
+
+.qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #E31E24;
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.qty-btn:hover:not(:disabled) {
+    background: #E31E24;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.qty-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f0f0f0;
+    color: #ccc;
+    box-shadow: none;
+}
+
+.qty-value {
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+.reason-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.summary-box {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.summary-row.total {
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #E31E24;
+}
+
+.kpi-warning {
+    color: #f39c12;
+    font-weight: 600;
+}
+
+.exchange-hint {
+    background: #e3f2fd;
+    color: #0d47a1;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    border-left: 4px solid #2196f3;
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: 12px;
+    background: #E31E24;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-confirm:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-cell img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+/* 3. Responsive: Khi màn hình nhỏ (Tablet/Mobile) thì rớt dòng */
+@media (max-width: 992px) {
+    .returns-container {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột */
+    }
+    
+    .sale-returns {
+        padding: 16px; /* Giảm padding trên mobile */
+    }
+}

@@ -1,0 +1,200 @@
+.performance-page {
+    /* Use 100% height but no scroll if possible, let parent handle or fit content */
+    height: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.perf-header {
+    margin-bottom: 12px;
+}
+
+.perf-header h2 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin: 0 0 4px 0;
+}
+
+.perf-header p {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.perf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.perf-card {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.perf-card h3 {
+    font-size: 12px;
+    color: #7f8c8d;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.big-number {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.big-number.warning-text {
+    color: #e67e22;
+}
+
+.sub-text {
+    font-size: 14px;
+    color: #999;
+}
+
+.comparison {
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.growth-badge {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.growth-badge.pos {
+    background: #d4edda;
+    color: #155724;
+}
+
+.growth-badge.neg {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* NEW LAYOUT */
+.perf-main-layout {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    /* 2.5 : 1 ratio */
+    gap: 16px;
+    /* Fill remaining height */
+    flex: 1;
+    min-height: 0;
+}
+
+.layout-col-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chart-box {
+    background: white;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Default height logic changes */
+}
+
+/* Main chart takes full height of left col */
+.chart-box.main-chart {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Mini chart takes remaining space (Grow) */
+.chart-box.mini-chart {
+    flex: 1;
+    min-height: 0;
+}
+
+.chart-box h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.chart-box canvas {
+    max-height: 100% !important;
+}
+
+.mini-chart-wrapper {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    min-height: 0;
+}
+
+/* Coaching Section: Compact at top */
+.coaching-section {
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    flex: 0 0 auto;
+    /* Do not grow, fit content */
+    max-height: 200px;
+    /* Safety limit */
+    overflow-y: auto;
+}
+
+.coaching-section h3 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tip-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.tip-item.positive {
+    background: #d1e7dd;
+    color: #0f5132;
+    border-left: 3px solid #198754;
+}
+
+.tip-item.negative {
+    background: #fff3cd;
+    color: #664d03;
+    border-left: 3px solid #ffc107;
+}
+
+.tip-item.warning {
+    background: #f8d7da;
+    color: #842029;
+    border-left: 3px solid #dc3545;
+}

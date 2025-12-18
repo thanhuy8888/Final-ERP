@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary-red: #E31E24;
+    --primary-gradient: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    --bg-main: #F4F7FE;
+    --card-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+    --border-soft: #E0E5F2;
+    --text-main: #1B2559;
+    --text-muted: #A3AED0;
+}
+
+.product-form-container {
+    padding: 35px;
+    background-color: var(--bg-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+}
+
+/* Fix Header & Back Button */
+.form-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto 30px;
+}
+
+.btn-back-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-main);
+}
+
+.btn-back-circle:hover {
+    background: var(--text-main);
+    color: white;
+    transform: translateX(-3px);
+}
+
+/* Balanced 70/30 Grid Layout */
+.form-bento-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr; 
+    gap: 28px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* Premium Card Design */
+.premium-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    border: none;
+    margin-bottom: 28px;
+}
+
+.card-header-icon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card-header-icon h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* Refined Inputs */
+.input-group label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-group input, .input-group select, .input-group textarea {
+    width: 100%;
+    padding: 13px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    background-color: #FAFCFF;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0px 10px 20px rgba(227, 30, 36, 0.1);
+    background: white;
+    outline: none;
+}
+
+/* Price Section */
+.highlight-price {
+    background: linear-gradient(135deg, #ffffff 0%, #fffafa 100%);
+    border: 1px solid #ffebeb;
+}
+
+.price-input-container input {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--primary-red);
+    border: none;
+    border-bottom: 2px solid #ffdada;
+    border-radius: 0;
+    background: transparent;
+    padding: 10px 0;
+}
+
+/* Square Pro Image Preview */
+.image-preview-frame {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 18px;
+    background: #F4F7FE;
+    border: 2px dashed var(--border-soft);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.image-preview-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Premium Buttons */
+.btn-save-gradient {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 14px 35px;
+    border-radius: 14px;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0px 10px 20px rgba(227, 30, 36, 0.2);
+    cursor: pointer;
+}
+
+.btn-cancel-glass {
+    background: white;
+    border: 1px solid var(--border-soft);
+    color: #64748B;
+    padding: 14px 30px;
+    border-radius: 14px;
+    font-weight: 600;
+}

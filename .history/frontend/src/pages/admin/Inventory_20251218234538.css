@@ -1,0 +1,498 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary-red: #E31E24;
+    --primary-blue: #3b82f6;
+    --bg-main: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-soft: #e2e8f0;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+}
+
+.inventory-page {
+    padding: 32px;
+    background-color: var(--bg-main);
+    min-height: 100vh;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Header Section */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.page-header .subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+/* Main Card */
+.content-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    overflow: hidden;
+}
+
+/* Toolbar & Search */
+.toolbar {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-bottom: 1px solid var(--border-soft);
+    gap: 16px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #f1f5f9;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    width: 400px;
+    border: 1px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-bar:focus-within {
+    background-color: #ffffff;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.1);
+}
+
+.search-bar input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.status-filter {
+    appearance: none;
+    background-color: #f1f5f9;
+    border: 1px solid transparent;
+    padding: 12px 40px 12px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 14px center;
+    background-repeat: no-repeat;
+    background-size: 1.2rem;
+}
+
+.status-filter:focus {
+    background-color: white;
+    border-color: var(--primary-red);
+    outline: none;
+}
+
+/* Table Styling */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    background: #f8fafc;
+    padding: 16px 24px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.admin-table td {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-main);
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.admin-table tr:hover td {
+    background-color: #fcfdfe;
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.product-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.product-name {
+    font-weight: 700;
+    color: var(--text-main);
+    display: block;
+}
+
+.qty-indicator {
+    font-weight: 800;
+    font-size: 16px;
+    padding: 4px 12px;
+    border-radius: 8px;
+}
+
+.qty-indicator.out_of_stock { color: #ef4444; background: #fef2f2; }
+.qty-indicator.low_stock { color: #f59e0b; background: #fffbeb; }
+.qty-indicator.normal { color: #10b981; background: #ecfdf5; }
+
+/* AI Pill - Premium Style */
+.ai-pill {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    max-width: 280px;
+}
+
+.ai-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+    border-color: #7dd3fc;
+}
+
+.ai-icon { color: #0284c7; }
+.ai-content strong { color: #0369a1; font-size: 13px; }
+.ai-reason { font-size: 11px; color: #0c4a6e; opacity: 0.8; }
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-red { background: #fee2e2; color: #dc2626; }
+.badge-yellow { background: #fef3c7; color: #d97706; }
+.badge-green { background: #d1fae5; color: #059669; }
+
+/* Modal - Glassmorphism */
+.modal-overlay {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    padding: 24px 32px;
+    background: #ffffff;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* AI Modal Specific */
+.ai-header {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    padding: 30px;
+    color: white;
+}
+
+.ai-suggestion-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.suggestion-main .highlight {
+    color: #0284c7;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+/* Buttons */
+.btn-refresh {
+    background: white;
+    border: 1px solid var(--border-soft);
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.btn-refresh:hover {
+    background: #f8fafc;
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.btn-primary {
+    background: var(--primary-red);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.2);
+}
+
+.btn-primary:hover {
+    background: #c41a1e;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(227, 30, 36, 0.3);
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: #e2e8f0;
+    color: var(--primary-blue);
+}
+/* --- Tinh chỉnh Modal Adjustment (Chỉ CSS) --- */
+
+/* 1. Khung Modal chính */
+.adjustment-modal {
+    max-width: 480px !important;
+    padding: 0 !important; /* Để header và footer có background riêng */
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* 2. Header của Modal */
+.adjustment-modal .modal-header {
+    padding: 24px 30px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.adjustment-modal .modal-header h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 3. Nút đóng (X) */
+.adjustment-modal .btn-close {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.adjustment-modal .btn-close:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fecaca;
+    transform: rotate(90deg);
+}
+
+/* 4. Thân Modal & Các nhóm Form */
+.adjustment-modal .modal-body {
+    padding: 30px;
+}
+
+.adjustment-modal .form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* Tăng khoảng cách giữa các ô nhập liệu */
+}
+
+.adjustment-modal .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+}
+
+/* 5. Toggle Group (Nút Add/Deduct Stock) */
+.adjustment-modal .toggle-group {
+    display: flex;
+    background: #f1f5f9;
+    padding: 5px;
+    border-radius: 12px;
+    gap: 5px;
+}
+
+.adjustment-modal .toggle-btn {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    color: #64748b;
+}
+
+/* Hiệu ứng khi nút được chọn (Active) */
+.adjustment-modal .toggle-btn.active {
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.adjustment-modal .toggle-btn.increase.active { color: #10b981; }
+.adjustment-modal .toggle-btn.decrease.active { color: #ef4444; }
+
+/* 6. Input, Select, Textarea */
+.adjustment-modal .form-input, 
+.adjustment-modal .form-select, 
+.adjustment-modal .form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.adjustment-modal .form-input:focus, 
+.adjustment-modal .form-select:focus, 
+.adjustment-modal .form-textarea:focus {
+    outline: none;
+    border-color: #E31E24; /* Màu đỏ Canifa */
+    background: white;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.1);
+}
+
+.adjustment-modal .form-textarea {
+    min-height: 100px;
+    resize: none; /* Tắt kéo giãn để giữ form đẹp */
+}
+
+/* 7. Footer & Nút bấm */
+.adjustment-modal .modal-footer {
+    padding: 20px 30px 30px;
+    display: flex;
+    gap: 12px;
+    background: white;
+}
+
+.adjustment-modal .btn-secondary {
+    flex: 1;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.adjustment-modal .btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.adjustment-modal .btn-primary {
+    flex: 2; /* Nút chính to hơn */
+    background: #E31E24;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.2);
+}
+
+.adjustment-modal .btn-primary:hover {
+    background: #c41a1e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(227, 30, 36, 0.3);
+}
+
+/* 8. Responsive cho Mobile */
+@media (max-width: 480px) {
+    .adjustment-modal {
+        width: 95%;
+        margin: 10px;
+    }
+}

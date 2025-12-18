@@ -1,0 +1,219 @@
+:root {
+    --primary-red: #E30019;
+    --primary-red-light: rgba(227, 0, 25, 0.1);
+    --success-green: #27ae60;
+    --warning-orange: #f39c12;
+    --info-blue: #3498db;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --bg-body: #f0f2f5;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --border-radius: 16px;
+}
+
+/* Container chính căn giữa */
+.dashboard-wrapper {
+    background-color: var(--bg-body);
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1320px; /* Độ rộng lý tưởng cho Dashboard chuyên nghiệp */
+}
+
+/* Tabs điều hướng to và rõ */
+.dashboard-tabs {
+    display: flex;
+    background: white;
+    padding: 10px;
+    border-radius: 20px;
+    margin-bottom: 35px;
+    box-shadow: var(--card-shadow);
+    gap: 12px;
+}
+
+.dashboard-tab {
+    flex: 1;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.dashboard-tab:hover {
+    background: var(--primary-red-light);
+    color: var(--primary-red);
+}
+
+.dashboard-tab.active {
+    background: var(--primary-red);
+    color: white;
+    box-shadow: 0 8px 20px rgba(227, 0, 25, 0.3);
+}
+
+/* KPI Grid - Box to và thoáng */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.kpi-card {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.3s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-8px);
+}
+
+.kpi-icon {
+    font-size: 2.2rem;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: var(--bg-body);
+}
+
+.kpi-info-content { flex: 1; }
+.kpi-label { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; margin-bottom: 8px; }
+.kpi-value { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+
+.trend-badge {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.trend-badge.pos { color: var(--success-green); }
+.trend-badge.neg { color: var(--primary-red); }
+
+/* Progress Card */
+.kpi-progress-card {
+    background: white;
+    padding: 35px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 35px;
+}
+
+.progress-bar-bg {
+    height: 16px;
+    background: #e9ecef;
+    border-radius: 30px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-red), #ff7675);
+    border-radius: 30px;
+    transition: width 1s ease-in-out;
+}
+
+/* Layout 2 cột cho Chart và Stock */
+.main-content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.chart-box {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.time-pill-selector {
+    background: var(--bg-body);
+    padding: 5px;
+    border-radius: 12px;
+    display: flex;
+    gap: 5px;
+}
+
+.time-pill {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.time-pill.active {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-container-large {
+    height: 400px;
+}
+
+/* Stock Alert Box */
+.stock-alert-box {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.stock-list-container {
+    margin-top: 20px;
+}
+
+.stock-row-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.stock-name-text { font-weight: 700; color: var(--text-main); display: block; }
+.stock-cat-text { font-size: 0.8rem; color: var(--text-muted); }
+.stock-status-pill {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+.stock-status-pill.critical { background: #fff5f5; color: var(--primary-red); }
+
+@media (max-width: 1100px) {
+    .main-content-grid { grid-template-columns: 1fr; }
+}
