@@ -1,0 +1,412 @@
+/* Orders.css */
+
+/* --- Filter Bar --- */
+.filter-container {
+    background: #ffffff;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    border: 1px solid #f1f5f9;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.modern-input,
+.modern-select {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #1e293b;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.modern-input {
+    padding-left: 36px;
+    /* Space for search icon */
+}
+
+.modern-select {
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    appearance: none;
+}
+
+.modern-input:focus,
+.modern-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modern-input::placeholder {
+    color: #94a3b8;
+}
+
+/* --- Buttons --- */
+.btn-modern {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.btn-modern.primary {
+    background: #0f172a;
+    /* Dark sleek */
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-modern.primary:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+}
+
+.btn-modern.secondary {
+    background: #fff;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+.btn-modern.secondary:hover {
+    background: #f8fafc;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+
+/* View Button */
+.btn-view-modern {
+    padding: 6px 12px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-view-modern:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* --- Status Badges (Soft/Pastel) --- */
+.badge-soft {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    /* Pill */
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1;
+}
+
+/* Pending: Soft Orange */
+.badge-soft.pending {
+    background-color: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #ffedd5;
+}
+
+/* Processing: Soft Blue */
+.badge-soft.processing {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #dbeafe;
+}
+
+/* Completed: Soft Green */
+.badge-soft.completed {
+    background-color: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #dcfce7;
+}
+
+/* Cancelled: Soft Red/Gray */
+.badge-soft.cancelled {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fee2e2;
+}
+
+/* Confirmed: Soft Indigo/Purple */
+.badge-soft.confirmed {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+    border: 1px solid #ede9fe;
+}
+
+/* Default/Unknown */
+.badge-soft.default {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+/* --- Table Refinements --- */
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-modern th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table-modern td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.table-modern tr:hover td {
+    background-color: #f8fafc;
+}
+
+.table-modern tr:last-child td {
+    border-bottom: none;
+}
+
+/* Tooltip for AI Insights */
+.tooltip-container .tooltip-text {
+    visibility: hidden;
+    width: 140px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 10;
+    bottom: 125%;
+    /* Position above */
+    left: 50%;
+    margin-left: -70px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.75rem;
+    font-weight: normal;
+    pointer-events: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+/* --- Returns Specific Styles --- */
+
+.order-ref-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.reason-tag {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.refund-amount-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.amount-val {
+    font-weight: 700;
+    color: #e11d48; /* Red for refund */
+}
+
+.high-value-pill {
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #ffe4e6;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+    width: fit-content;
+}
+
+/* Modal Enhancements */
+.modal-content-modern {
+    background: white;
+    width: 90%;
+    max-width: 720px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header-modern {
+    padding: 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-title h2 { font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; }
+.m-title p { color: #64748b; font-size: 0.85rem; margin: 4px 0 0 0; }
+
+.search-box-large {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    align-items: center;
+}
+
+.search-box-large .s-icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+}
+
+.search-box-large .modern-input {
+    padding-left: 44px;
+}
+
+.order-result-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #f8fafc;
+}
+
+.order-result-card:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: translateX(4px);
+}
+
+.order-result-card .o-id { font-weight: 700; color: #0f172a; display: block; }
+.order-result-card .o-cust { font-size: 0.8rem; color: #64748b; }
+.order-result-card .o-price { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+.refund-summary-card {
+    background: #fff1f2;
+    border: 1px solid #ffe4e6;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.warning-note {
+    display: flex;
+    gap: 10px;
+    color: #be123c;
+    font-size: 0.85rem;
+    max-width: 60%;
+}
+
+.total-refund strong {
+    display: block;
+    font-size: 1.5rem;
+    color: #e11d48;
+}
+
+.btn-back {
+    background: transparent;
+    border: none;
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.danger-action {
+    background: #e11d48 !important;
+    color: white !important;
+}
+
+.danger-action:hover {
+    background: #be123c !important;
+}
+
+.modern-input.center { text-align: center; }

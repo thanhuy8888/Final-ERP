@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary-red: #E31E24;
+    --primary-gradient: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    --bg-main: #F8FAFC;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --text-dark: #111827;
+    --text-slate: #64748B;
+}
+
+.category-list-page {
+    padding: 30px;
+    background-color: var(--bg-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+}
+
+/* Header mượt mà */
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+}
+
+/* Toolbar kiểu Glassmorphism */
+.toolbar {
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-bar {
+    background-color: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 16px;
+    width: 320px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.search-bar:focus-within {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.1);
+}
+
+/* Table Styling - Hiện đại & Thông thoáng */
+.content-card {
+    border-radius: 20px;
+    border: 1px solid #eef2f6;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.admin-table thead th {
+    background-color: #f8fafc;
+    color: var(--text-slate);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 18px 24px;
+}
+
+.admin-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #fffafa !important; /* Canifa light red tint */
+}
+
+/* Category Cell phân cấp */
+.category-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.category-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-slate);
+}
+
+/* Badges */
+.badge-blue {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+    font-weight: 700 !important;
+}
+
+.status-toggle {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+.status-toggle.active {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.status-toggle.inactive {
+    background-color: #f1f5f9;
+    color: #64748B;
+}
+
+/* Modal Premium */
+.modal-content {
+    border-radius: 24px;
+    padding: 32px;
+    border: none;
+}
+
+.modal-content h3 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    background-color: #f8fafc;
+}
+
+.form-group input:focus {
+    background-color: white;
+}
+
+/* Buttons */
+.btn-primary {
+    background: var(--primary-gradient);
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 10px 15px -3px rgba(227, 30, 36, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -3px rgba(227, 30, 36, 0.4);
+}
+
+.btn-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-icon:hover {
+    background: white;
+    transform: scale(1.1);
+}

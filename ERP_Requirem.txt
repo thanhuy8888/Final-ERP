@@ -1,0 +1,100 @@
+﻿1. Functional Requirements:
+
+
+ID
+	Feature Category
+	Functional Requirement Description
+	Admin Role
+	FR-01
+	User Management
+	Allow admin to create, update, and delete user accounts for sales staff, assigning appropriate roles and permissions.
+	FR-02
+	Product Management (Master Data)
+	Allow admin to manage product information, including adding new items with detailed attributes such as Name, SKU, Barcode, Material, Category (Men, Women, Kids), and Price.
+	FR-03
+	Variant Management
+	The system shall enable admin to define and manage product variants (Size: S, M, L, XL; Color: Red, Blue, etc.) for each SKU specific to Canifa's inventory structure.
+	FR-04
+	Inventory Management
+	The system shall allow admin to import initial stock, perform stock adjustments, and transfer inventory between different store locations or warehouses.The system shall support inventory alerts and approval workflows for critical stock adjustments.
+	FR-05
+	Promotion Engine
+	The system shall provide an interface for admin to configure promotion rules (time-bound discounts,....) applicable to specific categories or products.The system shall provide analytics to evaluate promotion effectiveness.
+	FR-06
+	Reporting & Analytics
+	The system shall generate and enable admin to see real-time dashboards showing daily sales, revenue by category, best-selling items, and low-stock alerts.The dashboard shall support performance analysis by sales staff and store level.
+	FR-07
+	Customer Data Management
+	The system shall allow admin to view customer databases, membership tiers (Silver, Gold, Diamond), and total loyalty points accumulated.
+	FR-08
+	Audit Log
+	The system shall record all critical actions (e.g., price changes, stock adjustments) taken by users for security and accountability purposes for admin
+	FR-09
+	Sales Performance Monitoring
+	The system shall allow admin to view and analyze sales performance metrics by individual sales staff and store.
+	FR-10
+	Inventory Alert & Optimization
+	The system shall notify admin of low-stock, overstock, and slow-moving inventory items.
+	FR-11
+	Promotion Effectiveness Analytics
+	The system shall provide analytics on promotion effectiveness, including revenue uplift and inventory impact.
+	FR-12
+	System Monitoring Dashboard
+	The system shall provide admin with an operational dashboard showing system-wide KPIs and abnormal activity alerts.
+	Sales Role
+	FR-13
+	Sales Transaction (POS)
+	The system shall allow the Sales staff to scan barcodes, add items to the cart, calculate totals (including VAT), and process payments via Cash/Card/QR.
+	FR-14
+	Multi-Store Stock Lookup
+	The system shall allow the Sales staff to check the availability of specific product sizes/colors in the current store or other nearby branches to assist customers.
+	FR-15
+	Loyalty & Membership
+	The system shall enable sales to look for customer information by phone number to accumulate points or apply membership discounts during checkout.
+	FR-16
+	Return & Exchange
+	The system shall support processing product returns or exchanges by validating the original transaction ID within the allowed policy period.
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Non-Functional Requirements:
+
+
+ID
+	Category
+	Non-Functional Requirement Description
+	NFR-01
+	Performance & Latency
+	The system shall process a standard sales transaction (scanning items to receipt printing) within 3 seconds to prevent queues during peak hours 
+	NFR-02
+	Scalability
+	The system backend shall be capable of handling a 200% increase in concurrent users and transactions during seasonal sales events without performance degradation.
+	NFR-03
+	Availability
+	The system shall ensure 99.9% uptime during store operating hours (8:00 AM - 10:00 PM) to ensure continuous business operations.
+	NFR-04
+	Security (Access Control)
+	The system shall enforce Role-Based Access Control (RBAC), ensuring that only users with 'Admin' privileges can modify pricing, view sensitive revenue reports, or alter stock levels.
+	NFR-05
+	Security (Encryption)
+	All sensitive data transmission (including customer passwords and payment information) must be encrypted using SSL/TLS 1.2 or higher protocols.
+	NFR-06
+	Usability
+	The Point of Sale (POS) interface shall be intuitive enough that a new sales staff member can perform basic checkout functions with less than 2 hours of training.
+	NFR-07
+	Portability
+	The POS module shall be designed as a web-based application or responsive app, capable of running on desktop PCs
+	NFR-08
+	Maintainability
+	The system architecture shall follow a modular design to allow for easy updates and bug fixes without affecting the entire system.

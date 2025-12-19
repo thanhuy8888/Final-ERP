@@ -1,0 +1,534 @@
+/* ============================================
+   AMERICAN RED CROSS INSPIRED DESIGN SYSTEM
+   ============================================ */
+
+:root {
+  /* === PRIMARY COLOR PALETTE === */
+  --red-cross-primary: #ed1b2e;
+  --red-cross-dark: #c41e3a;
+  --red-cross-light: #ff4655;
+
+  /* === NEUTRALS === */
+  --pure-white: #ffffff;
+  --pure-black: #000000;
+  --charcoal: #2b2b2b;
+  --dark-gray: #333333;
+  --medium-gray: #666666;
+  --light-gray: #999999;
+  --ultra-light-gray: #f5f5f5;
+
+  /* === ACCENT COLORS === */
+  --accent-cyan: #4fc3f7;
+  --accent-blue: #00a8e1;
+  --light-pink: #fff0f1;
+  --soft-blue: #e3f2fd;
+
+  /* === SEMANTIC COLORS === */
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: var(--accent-cyan);
+
+  /* === TYPOGRAPHY SCALE === */
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+  --font-display: "Inter", sans-serif;
+
+  /* Font sizes following 8px base scale */
+  --font-size-hero: clamp(48px, 5vw, 80px);
+  --font-size-h1: clamp(36px, 4vw, 64px);
+  --font-size-h2: clamp(28px, 3vw, 48px);
+  --font-size-h3: clamp(24px, 2.5vw, 36px);
+  --font-size-h4: clamp(20px, 2vw, 28px);
+  --font-size-h5: 20px;
+  --font-size-h6: 18px;
+  --font-size-body: 16px;
+  --font-size-body-lg: 18px;
+  --font-size-body-sm: 14px;
+  --font-size-caption: 12px;
+
+  /* Font weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* === SPACING SYSTEM (8px base) === */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-2xl: 64px;
+  --space-3xl: 80px;
+  --space-4xl: 96px;
+  --space-5xl: 120px;
+
+  /* === BORDER RADIUS === */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.2);
+  --shadow-red: 0 4px 20px rgba(237, 27, 46, 0.25);
+  --shadow-red-hover: 0 8px 30px rgba(237, 27, 46, 0.35);
+
+  /* === TRANSITIONS === */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* === LAYOUT === */
+  --container-max-width: 1280px;
+  --container-padding: 32px;
+  --grid-gap: 24px;
+
+  /* === Z-INDEX SCALE === */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* ============================================
+   GLOBAL RESETS & BASE STYLES
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  color: var(--dark-gray);
+  background-color: var(--pure-white);
+}
+
+/* ============================================
+   TYPOGRAPHY UTILITIES
+   ============================================ */
+
+.hero-title {
+  font-size: var(--font-size-hero);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.display-1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.heading-2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+}
+
+.heading-3 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
+.body-large {
+  font-size: var(--font-size-body-lg);
+  line-height: 1.7;
+}
+
+.body-regular {
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+}
+
+.body-small {
+  font-size: var(--font-size-body-sm);
+  line-height: 1.5;
+}
+
+.text-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.text-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ============================================
+   BUTTON SYSTEM
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 14px 32px;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-primary {
+  background-color: var(--red-cross-primary);
+  color: var(--pure-white);
+  box-shadow: var(--shadow-red);
+}
+
+.btn-primary:hover {
+  background-color: var(--red-cross-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-red-hover);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--pure-black);
+  color: var(--pure-white);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover {
+  background-color: var(--charcoal);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--red-cross-primary);
+  border: 2px solid var(--red-cross-primary);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background-color: var(--red-cross-primary);
+  color: var(--pure-white);
+}
+
+.btn-white {
+  background-color: var(--pure-white);
+  color: var(--red-cross-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-white:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-lg {
+  padding: 18px 40px;
+  font-size: var(--font-size-body-lg);
+}
+
+.btn-sm {
+  padding: 10px 24px;
+  font-size: var(--font-size-body-sm);
+}
+
+.btn-icon::after {
+  content: "→";
+  font-size: 18px;
+}
+
+/* ============================================
+   CARD SYSTEM
+   ============================================ */
+
+.card {
+  background: var(--pure-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.card-elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-flat {
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   LAYOUT UTILITIES
+   ============================================ */
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.section {
+  padding: var(--space-4xl) 0;
+}
+
+.section-lg {
+  padding: var(--space-5xl) 0;
+}
+
+.section-sm {
+  padding: var(--space-3xl) 0;
+}
+
+.grid {
+  display: grid;
+  gap: var(--grid-gap);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-auto {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap-sm {
+  gap: var(--space-sm);
+}
+
+.gap-md {
+  gap: var(--space-md);
+}
+
+.gap-lg {
+  gap: var(--space-lg);
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s var(--transition-base);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s var(--transition-base);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s var(--transition-base);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s var(--transition-bounce);
+}
+
+/* ============================================
+   STAT CARD COMPONENT
+   ============================================ */
+
+.stat-card {
+  background: var(--pure-white);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.stat-card-number {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--red-cross-primary);
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+}
+
+.stat-card-label {
+  font-size: var(--font-size-body);
+  color: var(--medium-gray);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ============================================
+   BADGE COMPONENT
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge-primary {
+  background-color: var(--red-cross-primary);
+  color: var(--pure-white);
+}
+
+.badge-secondary {
+  background-color: var(--ultra-light-gray);
+  color: var(--dark-gray);
+}
+
+.badge-cyan {
+  background-color: var(--accent-cyan);
+  color: var(--pure-white);
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+@media (max-width: 1440px) {
+  :root {
+    --container-padding: 24px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --container-padding: 16px;
+    --space-3xl: 48px;
+    --space-4xl: 64px;
+    --space-5xl: 80px;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    padding: 12px 24px;
+  }
+
+  .btn-lg {
+    padding: 14px 32px;
+  }
+}
+
+@media (max-width: 375px) {
+  :root {
+    --container-padding: 12px;
+  }
+}

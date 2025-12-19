@@ -1,0 +1,296 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-red: #E11D2A;
+    --primary-blue: #3B82F6;
+    --primary-green: #10B981;
+    --primary-yellow: #F59E0B;
+    --primary-purple: #8B5CF6;
+    
+    --text-dark: #1F2937;
+    --text-gray: #6B7280;
+    --text-light: #9CA3AF;
+    
+    --bg-body: #F3F4F6;
+    --card-bg: #FFFFFF;
+    
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+.dashboard-wrapper {
+    padding: 32px;
+    background-color: var(--bg-body);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+}
+
+/* --- Header --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.dashboard-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.date-filter-group {
+    background: var(--card-bg);
+    padding: 6px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    gap: 4px;
+}
+
+.filter-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: #F9FAFB;
+    color: var(--primary-blue);
+}
+
+.filter-btn.active {
+    background: var(--primary-blue); /* Hoặc primary-red tùy theme */
+    color: white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* --- Stats Cards --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column; /* Đổi sang column để giống mẫu 1 */
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0,0,0,0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    height: 140px;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Biến thể màu sắc cho card */
+.stat-card.variant-blue .stat-icon-bg { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); }
+.stat-card.variant-red .stat-icon-bg { background: rgba(225, 29, 42, 0.1); color: var(--primary-red); }
+.stat-card.variant-yellow .stat-icon-bg { background: rgba(245, 158, 11, 0.1); color: var(--primary-yellow); }
+.stat-card.variant-green .stat-icon-bg { background: rgba(16, 185, 129, 0.1); color: var(--primary-green); }
+
+/* Trang trí card */
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.stat-icon-bg {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.stat-info h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.stat-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-gray);
+    margin-top: 4px;
+}
+
+.stat-footer {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    gap: 6px;
+}
+
+.trend-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.trend-up { background: #ECFDF5; color: #059669; }
+.trend-down { background: #FEF2F2; color: #DC2626; }
+
+/* --- Charts Layout --- */
+.chart-box {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.chart-box h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.charts-grid-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.chart-container-lg {
+    height: 350px; /* Cao hơn để thoáng */
+    width: 100%;
+    position: relative;
+}
+
+.chart-container-sm {
+    height: 250px;
+    width: 100%;
+    position: relative;
+}
+
+/* --- Top Products List (Giống Recent Visits trong ảnh) --- */
+.top-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 350px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Scrollbar đẹp hơn */
+.top-products-list::-webkit-scrollbar {
+    width: 6px;
+}
+.top-products-list::-webkit-scrollbar-thumb {
+    background-color: #E5E7EB;
+    border-radius: 3px;
+}
+
+.top-product-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.top-product-item:hover {
+    background: #F9FAFB;
+}
+
+.prod-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.prod-info {
+    flex: 1;
+}
+
+.prod-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+.prod-sub {
+    font-size: 12px;
+    color: var(--text-gray);
+}
+
+.prod-value {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: #F3F4F6;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* Secondary Grid */
+.charts-grid-secondary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 1200px) {
+    .charts-grid-main { grid-template-columns: 1fr; }
+    .charts-grid-secondary { grid-template-columns: 1fr; }
+    .chart-container-lg { height: 300px; }
+}

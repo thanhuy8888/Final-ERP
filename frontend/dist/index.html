@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#E31E24" />
+    <meta name="description" content="CANIFA - Thời trang chất lượng cao, mua sắm online tiện lợi" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>CANIFA - Fashion Store</title>
+    <script type="module" crossorigin src="/assets/index-O40gh4JO.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CIM9whgA.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

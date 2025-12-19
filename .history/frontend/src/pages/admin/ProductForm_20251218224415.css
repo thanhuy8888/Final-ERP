@@ -1,0 +1,110 @@
+.product-form-container {
+    padding: 30px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Chia form chính và ảnh/trạng thái */
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.form-section-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eef2f6;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+
+.input-group {
+    margin-bottom: 18px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    background: #fcfdfe;
+}
+
+.input-group input:focus {
+    border-color: #E31E24;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.1);
+    outline: none;
+    background: white;
+}
+
+.image-preview-box {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f8fafc;
+    margin-top: 10px;
+}
+
+.image-preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #FF3E45 0%, #E31E24 100%);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 15px rgba(227, 30, 36, 0.2);
+    transition: transform 0.2s;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(227, 30, 36, 0.3);
+}
+
+.btn-cancel {
+    background: white;
+    color: #64748b;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+}
