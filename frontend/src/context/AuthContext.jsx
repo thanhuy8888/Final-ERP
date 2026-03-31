@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
             const response = await api.post('/login.php', { username, password });
             if (response.data.success) {
                 setUser(response.data.user);
-                return { success: true };
+                return { success: true, role: response.data.user.role };
             }
         } catch (error) {
             return {
@@ -58,4 +58,10 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};

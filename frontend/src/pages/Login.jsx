@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 import Navbar from '../components/Navbar';
 import './Login.css';
 
 const Login = () => {
+    const { t } = useTranslation();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,7 +17,10 @@ const Login = () => {
         e.preventDefault();
         const result = await login(username, password);
         if (result.success) {
-            navigate('/');
+            const role = result.role ? result.role.toLowerCase() : 'customer';
+            if (role === 'admin') navigate('/admin');
+            else if (role === 'sale') navigate('/sale');
+            else navigate('/');
         } else {
             setError(result.message);
         }
@@ -26,11 +31,11 @@ const Login = () => {
             <Navbar />
             <div className="login-container">
                 <div className="login-box">
-                    <h2>ĐĂNG NHẬP</h2>
+                    <h2>{t('login.title')}</h2>
                     {error && <p className="error-message">{error}</p>}
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label>Tên đăng nhập</label>
+                            <label>{t('login.username')}</label>
                             <input
                                 type="text"
                                 value={username}
@@ -39,7 +44,7 @@ const Login = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Mật khẩu</label>
+                            <label>{t('login.password')}</label>
                             <input
                                 type="password"
                                 value={password}
@@ -47,10 +52,10 @@ const Login = () => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn-submit">ĐĂNG NHẬP</button>
+                        <button type="submit" className="btn-submit">{t('login.submit')}</button>
                     </form>
                     <p className="switch-text">
-                        Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+                        {t('login.noAccount')} <Link to="/register">{t('login.registerNow')}</Link>
                     </p>
                 </div>
             </div>

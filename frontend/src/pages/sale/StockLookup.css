@@ -1,0 +1,390 @@
+/* Stock Lookup Page */
+.stock-lookup-page {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.stock-header {
+    margin-bottom: 20px;
+}
+
+.stock-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.stock-subtitle {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Statistics Grid */
+.stock-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.critical-stat .stat-value {
+    color: #e74c3c;
+}
+
+.warning-stat .stat-value {
+    color: #f39c12;
+}
+
+.good-stat .stat-value {
+    color: #27ae60;
+}
+
+/* Controls */
+.stock-controls {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    /* Fix alignment */
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.search-form {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    max-width: 500px;
+    /* Limit width */
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #E30019;
+}
+
+.search-btn {
+    padding: 0 20px;
+    /* Use flex alignment instead of vertical padding if needed, but height is determined by padding usually. Let's keep padding but add flex */
+    padding: 10px 20px;
+    background: #E30019;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-btn:hover {
+    background: #c20016;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: white;
+    color: #666;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    border-color: #E30019;
+    color: #E30019;
+}
+
+.filter-btn.active {
+    background: #E30019;
+    color: white;
+    border-color: #E30019;
+}
+
+
+.status-filter {
+    display: flex;
+    gap: 6px;
+}
+
+
+/* Action Buttons */
+.btn-action-sm {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    background: #f8f9fa;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+}
+
+.btn-action-sm:hover {
+    background: #e2e6ea;
+}
+
+.btn-action-sm.suggest {
+    color: #E30019;
+    border-color: #E30019;
+    background: #fff5f5;
+}
+
+.btn-action-sm.branch {
+    color: #f39c12;
+    border-color: #f39c12;
+    background: #fffbf0;
+}
+
+/* .action-cell uses default table-cell behavior */
+
+.action-wrapper {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Table */
+.stock-table-wrapper {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stock-table thead {
+    background: #f8f9fa;
+}
+
+.stock-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.85rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.stock-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.stock-row:hover {
+    background: #f8f9fa;
+}
+
+.product-cell {
+    min-width: 250px;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.product-details {
+    flex: 1;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.product-sku {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.variant-cell {
+    color: #666;
+}
+
+.variant-sku {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 2px;
+}
+
+.store-cell {
+    font-weight: 600;
+    color: #E30019;
+}
+
+.quantity-cell {
+    text-align: center;
+}
+
+.quantity-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.quantity-badge.critical {
+    background: #fff5f5;
+    color: #e74c3c;
+}
+
+.quantity-badge.warning {
+    background: #fffbf0;
+    color: #f39c12;
+}
+
+.quantity-badge.good {
+    background: #f0f9f4;
+    color: #27ae60;
+}
+
+.quantity-badge.out-of-stock {
+    background: #f5f5f5;
+    color: #999;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.critical {
+    background: #e74c3c;
+    color: white;
+}
+
+.status-badge.warning {
+    background: #f39c12;
+    color: white;
+}
+
+.status-badge.good {
+    background: #27ae60;
+    color: white;
+}
+
+.status-badge.out-of-stock {
+    background: #999;
+    color: white;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-style: italic;
+}
+
+.stock-footer {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .stock-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stock-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-form {
+        min-width: 100%;
+    }
+
+    .status-filter {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .stock-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stock-table {
+        font-size: 0.85rem;
+    }
+
+    .product-image {
+        width: 40px;
+        height: 40px;
+    }
+}
